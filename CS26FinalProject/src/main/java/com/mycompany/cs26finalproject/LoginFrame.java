@@ -9,7 +9,7 @@ package com.mycompany.cs26finalproject;
  * @author dionardvale
  */
 public class LoginFrame extends javax.swing.JFrame {
-//tset comment
+//set comment
     /**
      * Creates new form LoginFrame
      */
