@@ -3,13 +3,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.mycompany.cs26finalproject;
-import javax.swing.JFrame;
+import javax.swing.*;
+import java.awt.*;
 /**
  *
  * @author dionardvale
  */
 public class MainDashboard {
     public static void main (String[] args) {
+        JButton button;
         JFrame dashboard = new JFrame();
         dashboard.setTitle("Test");
         dashboard.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
