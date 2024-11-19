@@ -18,6 +18,7 @@ public class MainDashboard {
     public MainDashboard() {
         // Create the main frame (JFrame)
         JFrame dashboard = new JFrame();
+        //todo: Change title
         dashboard.setTitle("Test");
         dashboard.setLayout(new GridBagLayout());
         dashboard.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
