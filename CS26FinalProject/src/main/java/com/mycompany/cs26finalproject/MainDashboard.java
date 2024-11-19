@@ -10,6 +10,10 @@ import javax.swing.JFrame;
  */
 public class MainDashboard {
     public static void main (String[] args) {
-        
+        JFrame dashboard = new JFrame();
+        dashboard.setTitle("Test");
+        dashboard.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        dashboard.setSize (1000,1000);
+        dashboard.setVisible(true);
     }
 }
