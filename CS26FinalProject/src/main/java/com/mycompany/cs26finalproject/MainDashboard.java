@@ -13,7 +13,7 @@ public class MainDashboard {
         JFrame dashboard = new JFrame();
         dashboard.setTitle("Test");
         dashboard.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        dashboard.setSize (1000,1000);
+        dashboard.setSize (1600,1000);
         dashboard.setVisible(true);
     }
 }
