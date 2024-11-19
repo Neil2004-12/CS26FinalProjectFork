@@ -102,8 +102,9 @@ public class LoginFrame extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            //todo: change to LoginFrame once done with testing
             public void run() {
-                new LoginFrame().setVisible(true);
+                new MainDashboard().setVisible(true);
             }
         });
     }
