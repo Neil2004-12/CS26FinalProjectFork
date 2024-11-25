@@ -26,16 +26,91 @@ public class LoginFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
+        mainBackgroundPanel = new javax.swing.JPanel();
+        mainBackgroundPanel2 = new javax.swing.JPanel();
+        tastManagerTitle = new javax.swing.JLabel();
+        emailTextLabel = new javax.swing.JLabel();
+        emailTextField = new javax.swing.JTextField();
+        passwordTextLabel = new javax.swing.JLabel();
+        passwordField = new javax.swing.JPasswordField();
+        checkBoxRememberMe = new javax.swing.JCheckBox();
+        signInButton = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setText("Email");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 90, 90, 30));
+        mainBackgroundPanel.setBackground(new java.awt.Color(0, 102, 153));
+        mainBackgroundPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        mainBackgroundPanel2.setBackground(new java.awt.Color(249, 239, 196));
+        mainBackgroundPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        tastManagerTitle.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        tastManagerTitle.setForeground(new java.awt.Color(0, 0, 0));
+        tastManagerTitle.setText("Task Manager");
+        mainBackgroundPanel2.add(tastManagerTitle, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 30, 169, -1));
+
+        emailTextLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        emailTextLabel.setForeground(new java.awt.Color(0, 0, 0));
+        emailTextLabel.setText("Email");
+        mainBackgroundPanel2.add(emailTextLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 100, 60, 20));
+
+        emailTextField.setBackground(new java.awt.Color(204, 204, 204));
+        emailTextField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        emailTextField.setForeground(new java.awt.Color(0, 0, 0));
+        emailTextField.setText("Enter your Email");
+        emailTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                emailTextFieldActionPerformed(evt);
+            }
+        });
+        mainBackgroundPanel2.add(emailTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 130, 270, 30));
+
+        passwordTextLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        passwordTextLabel.setForeground(new java.awt.Color(0, 0, 0));
+        passwordTextLabel.setText("Password");
+        mainBackgroundPanel2.add(passwordTextLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 180, -1, -1));
+
+        passwordField.setBackground(new java.awt.Color(204, 204, 204));
+        passwordField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        passwordField.setForeground(new java.awt.Color(0, 0, 0));
+        passwordField.setText("jPasswordField1");
+        passwordField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                passwordFieldActionPerformed(evt);
+            }
+        });
+        mainBackgroundPanel2.add(passwordField, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 210, 270, 30));
+
+        checkBoxRememberMe.setBackground(new java.awt.Color(255, 255, 255));
+        checkBoxRememberMe.setForeground(new java.awt.Color(0, 0, 0));
+        checkBoxRememberMe.setText("Remember Me");
+        mainBackgroundPanel2.add(checkBoxRememberMe, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 280, -1, -1));
+
+        signInButton.setBackground(new java.awt.Color(0, 102, 153));
+        signInButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        signInButton.setForeground(new java.awt.Color(255, 255, 255));
+        signInButton.setText("Sign In");
+        mainBackgroundPanel2.add(signInButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 320, 200, -1));
+
+        jButton1.setText("jButton1");
+        mainBackgroundPanel2.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 360, 200, -1));
+
+        mainBackgroundPanel.add(mainBackgroundPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(25, 22, 760, 440));
+
+        getContentPane().add(mainBackgroundPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 810, 480));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void emailTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_emailTextFieldActionPerformed
+
+    private void passwordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_passwordFieldActionPerformed
 
     /**
      * @param args the command line arguments
@@ -75,6 +150,15 @@ public class LoginFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JCheckBox checkBoxRememberMe;
+    private javax.swing.JTextField emailTextField;
+    private javax.swing.JLabel emailTextLabel;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JPanel mainBackgroundPanel;
+    private javax.swing.JPanel mainBackgroundPanel2;
+    private javax.swing.JPasswordField passwordField;
+    private javax.swing.JLabel passwordTextLabel;
+    private javax.swing.JButton signInButton;
+    private javax.swing.JLabel tastManagerTitle;
     // End of variables declaration//GEN-END:variables
 }
