@@ -1,20 +1,18 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.cs26finalproject;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
 
-/**
- *
- * @author dionardvale
- */
 public class MainDashboard {
-    JButton b1, b2, b3, b4, b5;
-    JPanel panel1, panel2, panel3;
     GridBagConstraints gbc = new GridBagConstraints();
+
+    // Store projects: project name -> Kanban content panel
+    private HashMap<String, JPanel> projects = new HashMap<>();
+    private JPanel kanbanContent; // Active Kanban content area
+    private JPanel projectListPanel; // Panel for the list of projects
+    private ButtonGroup projectButtonGroup; // Button group for radio buttons
+    private JPanel mainContent; // Kanban board area
 
     public MainDashboard() {
         // Create the main frame (JFrame)
@@ -37,8 +35,9 @@ public class MainDashboard {
         gbc.weighty = 0.1; // Small height for the nav bar
         dashboard.add(topNavBar, gbc);
 
-        // Vertical navigation bar
+        // Vertical navigation bar (left pane)
         JPanel sideNavBar = new JPanel();
+        sideNavBar.setLayout(new BorderLayout());
         sideNavBar.setBackground(Color.GREEN);
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -48,10 +47,26 @@ public class MainDashboard {
         gbc.weighty = 1;
         dashboard.add(sideNavBar, gbc);
 
-        // Main content area
-        JPanel mainContent = new JPanel();
+        // Project list and "Add Project" button
+        projectListPanel = new JPanel();
+        projectListPanel.setLayout(new BoxLayout(projectListPanel, BoxLayout.Y_AXIS));
+        projectListPanel.setBackground(Color.GREEN);
+
+        JScrollPane projectListScrollPane = new JScrollPane(projectListPanel);
+        projectListScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        sideNavBar.add(projectListScrollPane, BorderLayout.CENTER);
+
+        JButton addProjectButton = new JButton("Add Project");
+        sideNavBar.add(addProjectButton, BorderLayout.SOUTH);
+
+        // Button group for projects
+        projectButtonGroup = new ButtonGroup();
+
+        // Main content area for the active Kanban board
+        mainContent = new JPanel();
         mainContent.setLayout(new BorderLayout());
         mainContent.setBackground(Color.LIGHT_GRAY);
+
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
@@ -60,31 +75,65 @@ public class MainDashboard {
         gbc.weighty = 1;
         dashboard.add(mainContent, gbc);
 
-        // Scrollable Kanban board
-        JPanel kanbanContent = new JPanel();
-        kanbanContent.setLayout(new GridBagLayout());
-        JScrollPane scrollPane = new JScrollPane(kanbanContent);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        mainContent.add(scrollPane, BorderLayout.CENTER);
-
-        // Button to add new columns
-        JPanel buttonPanel = new JPanel();
-        JButton addColumnButton = new JButton("Add new list");
-        buttonPanel.add(addColumnButton);
-        mainContent.add(buttonPanel, BorderLayout.SOUTH);
-
-        // Add column action
-        addColumnButton.addActionListener(e -> {
-            String columnName = JOptionPane.showInputDialog(dashboard, "Enter list name:");
-            if (columnName != null && !columnName.trim().isEmpty()) {
-                addKanbanColumn(kanbanContent, columnName);
-                kanbanContent.revalidate();
-                kanbanContent.repaint();
+        // Add project action
+        addProjectButton.addActionListener(e -> {
+            String projectName = JOptionPane.showInputDialog(dashboard, "Enter project name:");
+            if (projectName != null && !projectName.trim().isEmpty() && !projects.containsKey(projectName)) {
+                addProject(projectName);
+                projectListPanel.revalidate();
+                projectListPanel.repaint();
             }
         });
 
         dashboard.setVisible(true);
+    }
+
+    // Method to add a new project
+    private void addProject(String projectName) {
+        // Create new Kanban panel for the project
+        JPanel projectKanban = new JPanel();
+        projectKanban.setLayout(new GridBagLayout());
+        JScrollPane projectScrollPane = new JScrollPane(projectKanban);
+        projectScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        projectScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+
+        // Add Kanban panel to the map
+        projects.put(projectName, projectKanban);
+
+        // Add project to the list in the left nav bar
+        JRadioButton projectButton = new JRadioButton(projectName);
+        projectButtonGroup.add(projectButton);
+        projectButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        projectButton.addActionListener(e -> setActiveProject(projectName));
+        projectListPanel.add(projectButton);
+
+        // If it's the first project, select it by default
+        if (projects.size() == 1) {
+            projectButton.setSelected(true);
+            setActiveProject(projectName);
+        }
+    }
+
+    // Set the active project and display its Kanban board
+    private void setActiveProject(String projectName) {
+        JPanel selectedKanban = projects.get(projectName);
+        mainContent.removeAll();
+        mainContent.add(selectedKanban, BorderLayout.CENTER);
+
+        // Add "Add List" button for the active project
+        JButton addListButton = new JButton("Add List");
+        addListButton.addActionListener(e -> {
+            String listName = JOptionPane.showInputDialog(mainContent, "Enter list name:");
+            if (listName != null && !listName.trim().isEmpty()) {
+                addKanbanColumn(selectedKanban, listName);
+                selectedKanban.revalidate();
+                selectedKanban.repaint();
+            }
+        });
+        mainContent.add(addListButton, BorderLayout.SOUTH);
+
+        mainContent.revalidate();
+        mainContent.repaint();
     }
 
     // Method to add a Kanban column dynamically
