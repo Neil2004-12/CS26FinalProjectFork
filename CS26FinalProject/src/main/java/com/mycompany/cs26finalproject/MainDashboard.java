@@ -19,7 +19,7 @@ public class MainDashboard {
     public MainDashboard() {
         // Create the main frame (JFrame)
         JFrame dashboard = new JFrame();
-        dashboard.setTitle("Test");
+        dashboard.setTitle("Kanban Dashboard");
         dashboard.setLayout(new GridBagLayout());
         dashboard.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         dashboard.setSize(1600, 1000);
@@ -119,7 +119,34 @@ public class MainDashboard {
         taskScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         columnPanel.add(taskScrollPane, BorderLayout.CENTER);
 
+        // Button to add tasks
+        JButton addTaskButton = new JButton("Add Task");
+        addTaskButton.addActionListener(e -> {
+            String taskName = JOptionPane.showInputDialog(kanbanContent, "Enter task name:");
+            if (taskName != null && !taskName.trim().isEmpty()) {
+                addTaskToColumn(taskPanel, taskName);
+                taskPanel.revalidate();
+                taskPanel.repaint();
+            }
+        });
+        columnPanel.add(addTaskButton, BorderLayout.SOUTH);
+
         kanbanContent.add(columnPanel, columnGbc);
+    }
+
+    // Method to add a task to a specific column
+    private void addTaskToColumn(JPanel taskPanel, String taskName) {
+        JLabel taskCard = new JLabel(taskName);
+        taskCard.setOpaque(true);
+        taskCard.setBackground(Color.WHITE);
+        taskCard.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        taskCard.setAlignmentX(Component.CENTER_ALIGNMENT);
+        taskCard.setMaximumSize(new Dimension(200, 50));
+        taskCard.setPreferredSize(new Dimension(200, 50));
+        taskCard.setHorizontalAlignment(SwingConstants.CENTER);
+
+        taskPanel.add(taskCard);
+        taskPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Add spacing between tasks
     }
 
     public static void main(String[] args) {
