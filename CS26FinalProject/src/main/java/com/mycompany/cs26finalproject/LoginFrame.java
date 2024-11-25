@@ -35,7 +35,8 @@ public class LoginFrame extends javax.swing.JFrame {
         passwordField = new javax.swing.JPasswordField();
         checkBoxRememberMe = new javax.swing.JCheckBox();
         signInButton = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        signInWithGoogleButton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -86,16 +87,34 @@ public class LoginFrame extends javax.swing.JFrame {
         checkBoxRememberMe.setBackground(new java.awt.Color(249, 239, 196));
         checkBoxRememberMe.setForeground(new java.awt.Color(0, 0, 0));
         checkBoxRememberMe.setText("Remember Me");
-        mainBackgroundPanel2.add(checkBoxRememberMe, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 280, -1, -1));
+        checkBoxRememberMe.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkBoxRememberMeActionPerformed(evt);
+            }
+        });
+        mainBackgroundPanel2.add(checkBoxRememberMe, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 290, -1, -1));
 
         signInButton.setBackground(new java.awt.Color(0, 102, 153));
         signInButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         signInButton.setForeground(new java.awt.Color(255, 255, 255));
         signInButton.setText("Sign In");
-        mainBackgroundPanel2.add(signInButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 320, 200, -1));
+        mainBackgroundPanel2.add(signInButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 313, 270, 30));
 
-        jButton1.setText("jButton1");
-        mainBackgroundPanel2.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 360, 200, -1));
+        signInWithGoogleButton.setBackground(new java.awt.Color(204, 204, 204));
+        signInWithGoogleButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        signInWithGoogleButton.setForeground(new java.awt.Color(0, 0, 0));
+        signInWithGoogleButton.setText("Sign In with Google");
+        signInWithGoogleButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                signInWithGoogleButtonActionPerformed(evt);
+            }
+        });
+        mainBackgroundPanel2.add(signInWithGoogleButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 350, 270, 30));
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel1.setText("Don't have an account yet?");
+        mainBackgroundPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 150, -1));
 
         mainBackgroundPanel.add(mainBackgroundPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(25, 22, 760, 440));
 
@@ -111,6 +130,14 @@ public class LoginFrame extends javax.swing.JFrame {
     private void passwordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordFieldActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_passwordFieldActionPerformed
+
+    private void signInWithGoogleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signInWithGoogleButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_signInWithGoogleButtonActionPerformed
+
+    private void checkBoxRememberMeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxRememberMeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_checkBoxRememberMeActionPerformed
 
     /**
      * @param args the command line arguments
@@ -153,12 +180,13 @@ public class LoginFrame extends javax.swing.JFrame {
     private javax.swing.JCheckBox checkBoxRememberMe;
     private javax.swing.JTextField emailTextField;
     private javax.swing.JLabel emailTextLabel;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel mainBackgroundPanel;
     private javax.swing.JPanel mainBackgroundPanel2;
     private javax.swing.JPasswordField passwordField;
     private javax.swing.JLabel passwordTextLabel;
     private javax.swing.JButton signInButton;
+    private javax.swing.JButton signInWithGoogleButton;
     private javax.swing.JLabel tastManagerTitle;
     // End of variables declaration//GEN-END:variables
 }
