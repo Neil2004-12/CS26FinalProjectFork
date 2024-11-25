@@ -76,7 +76,7 @@ public class MainDashboard {
 
         // Add column action
         addColumnButton.addActionListener(e -> {
-            String columnName = JOptionPane.showInputDialog(dashboard, "Enter column name:");
+            String columnName = JOptionPane.showInputDialog(dashboard, "Enter list name:");
             if (columnName != null && !columnName.trim().isEmpty()) {
                 addKanbanColumn(kanbanContent, columnName);
                 kanbanContent.revalidate();
