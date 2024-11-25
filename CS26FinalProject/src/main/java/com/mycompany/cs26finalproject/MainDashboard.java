@@ -70,7 +70,7 @@ public class MainDashboard {
 
         // Button to add new columns
         JPanel buttonPanel = new JPanel();
-        JButton addColumnButton = new JButton("Add Column");
+        JButton addColumnButton = new JButton("Add new list");
         buttonPanel.add(addColumnButton);
         mainContent.add(buttonPanel, BorderLayout.SOUTH);
 
