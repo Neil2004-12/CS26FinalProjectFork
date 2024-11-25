@@ -83,7 +83,7 @@ public class LoginFrame extends javax.swing.JFrame {
         });
         mainBackgroundPanel2.add(passwordField, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 210, 270, 30));
 
-        checkBoxRememberMe.setBackground(new java.awt.Color(255, 255, 255));
+        checkBoxRememberMe.setBackground(new java.awt.Color(249, 239, 196));
         checkBoxRememberMe.setForeground(new java.awt.Color(0, 0, 0));
         checkBoxRememberMe.setText("Remember Me");
         mainBackgroundPanel2.add(checkBoxRememberMe, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 280, -1, -1));
