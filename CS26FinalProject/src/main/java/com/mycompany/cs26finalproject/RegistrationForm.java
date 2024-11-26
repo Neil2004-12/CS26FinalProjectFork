@@ -32,6 +32,10 @@ public class RegistrationForm extends javax.swing.JFrame {
         firstNameTextField = new javax.swing.JTextField();
         lastNameLabel = new javax.swing.JLabel();
         lastNameTextField = new javax.swing.JTextField();
+        emailLabel = new javax.swing.JLabel();
+        emailTextField = new javax.swing.JTextField();
+        passwordLabel = new javax.swing.JLabel();
+        passwordInputTextField = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -46,7 +50,7 @@ public class RegistrationForm extends javax.swing.JFrame {
         firstNameLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         firstNameLabel.setForeground(new java.awt.Color(0, 0, 0));
         firstNameLabel.setText("First Name");
-        mainBackgroundRegister2.add(firstNameLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, -1, -1));
+        mainBackgroundRegister2.add(firstNameLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, 100, -1));
 
         firstNameTextField.setBackground(new java.awt.Color(204, 204, 204));
         firstNameTextField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -56,12 +60,32 @@ public class RegistrationForm extends javax.swing.JFrame {
         lastNameLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         lastNameLabel.setForeground(new java.awt.Color(0, 0, 0));
         lastNameLabel.setText("Last Name");
-        mainBackgroundRegister2.add(lastNameLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, -1, -1));
+        mainBackgroundRegister2.add(lastNameLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 100, -1));
 
         lastNameTextField.setBackground(new java.awt.Color(204, 204, 204));
         lastNameTextField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lastNameTextField.setForeground(new java.awt.Color(0, 0, 0));
         mainBackgroundRegister2.add(lastNameTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 140, 220, -1));
+
+        emailLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        emailLabel.setForeground(new java.awt.Color(0, 0, 0));
+        emailLabel.setText("Email");
+        mainBackgroundRegister2.add(emailLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 190, 50, -1));
+
+        emailTextField.setBackground(new java.awt.Color(204, 204, 204));
+        emailTextField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        emailTextField.setForeground(new java.awt.Color(0, 0, 0));
+        mainBackgroundRegister2.add(emailTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 220, 220, -1));
+
+        passwordLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        passwordLabel.setForeground(new java.awt.Color(0, 0, 0));
+        passwordLabel.setText("Password");
+        mainBackgroundRegister2.add(passwordLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 270, -1, -1));
+
+        passwordInputTextField.setBackground(new java.awt.Color(204, 204, 204));
+        passwordInputTextField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        passwordInputTextField.setForeground(new java.awt.Color(0, 0, 0));
+        mainBackgroundRegister2.add(passwordInputTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 300, 220, -1));
 
         mainBackgroundRegister.add(mainBackgroundRegister2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 760, 440));
 
@@ -106,11 +130,15 @@ public class RegistrationForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel emailLabel;
+    private javax.swing.JTextField emailTextField;
     private javax.swing.JLabel firstNameLabel;
     private javax.swing.JTextField firstNameTextField;
     private javax.swing.JLabel lastNameLabel;
     private javax.swing.JTextField lastNameTextField;
     private javax.swing.JPanel mainBackgroundRegister;
     private javax.swing.JPanel mainBackgroundRegister2;
+    private javax.swing.JPasswordField passwordInputTextField;
+    private javax.swing.JLabel passwordLabel;
     // End of variables declaration//GEN-END:variables
 }
