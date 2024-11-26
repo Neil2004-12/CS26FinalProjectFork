@@ -36,6 +36,7 @@ public class RegistrationForm extends javax.swing.JFrame {
         emailTextField = new javax.swing.JTextField();
         passwordLabel = new javax.swing.JLabel();
         passwordInputTextField = new javax.swing.JPasswordField();
+        signInRegisterButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -86,6 +87,12 @@ public class RegistrationForm extends javax.swing.JFrame {
         passwordInputTextField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         passwordInputTextField.setForeground(new java.awt.Color(0, 0, 0));
         mainBackgroundRegister2.add(passwordInputTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 300, 220, -1));
+
+        signInRegisterButton.setBackground(new java.awt.Color(0, 102, 153));
+        signInRegisterButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        signInRegisterButton.setForeground(new java.awt.Color(255, 255, 255));
+        signInRegisterButton.setText("Sign Up");
+        mainBackgroundRegister2.add(signInRegisterButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 350, 220, -1));
 
         mainBackgroundRegister.add(mainBackgroundRegister2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 760, 440));
 
@@ -140,5 +147,6 @@ public class RegistrationForm extends javax.swing.JFrame {
     private javax.swing.JPanel mainBackgroundRegister2;
     private javax.swing.JPasswordField passwordInputTextField;
     private javax.swing.JLabel passwordLabel;
+    private javax.swing.JButton signInRegisterButton;
     // End of variables declaration//GEN-END:variables
 }
