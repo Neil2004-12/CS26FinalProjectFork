@@ -28,6 +28,10 @@ public class RegistrationForm extends javax.swing.JFrame {
 
         mainBackgroundRegister = new javax.swing.JPanel();
         mainBackgroundRegister2 = new javax.swing.JPanel();
+        firstNameLabel = new javax.swing.JLabel();
+        firstNameTextField = new javax.swing.JTextField();
+        lastNameLabel = new javax.swing.JLabel();
+        lastNameTextField = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -38,6 +42,27 @@ public class RegistrationForm extends javax.swing.JFrame {
 
         mainBackgroundRegister2.setBackground(new java.awt.Color(249, 239, 196));
         mainBackgroundRegister2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        firstNameLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        firstNameLabel.setForeground(new java.awt.Color(0, 0, 0));
+        firstNameLabel.setText("First Name");
+        mainBackgroundRegister2.add(firstNameLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, -1, -1));
+
+        firstNameTextField.setBackground(new java.awt.Color(204, 204, 204));
+        firstNameTextField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        firstNameTextField.setForeground(new java.awt.Color(0, 0, 0));
+        mainBackgroundRegister2.add(firstNameTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 220, -1));
+
+        lastNameLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lastNameLabel.setForeground(new java.awt.Color(0, 0, 0));
+        lastNameLabel.setText("Last Name");
+        mainBackgroundRegister2.add(lastNameLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, -1, -1));
+
+        lastNameTextField.setBackground(new java.awt.Color(204, 204, 204));
+        lastNameTextField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lastNameTextField.setForeground(new java.awt.Color(0, 0, 0));
+        mainBackgroundRegister2.add(lastNameTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 140, 220, -1));
+
         mainBackgroundRegister.add(mainBackgroundRegister2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 760, 440));
 
         getContentPane().add(mainBackgroundRegister, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 810, 480));
@@ -81,6 +106,10 @@ public class RegistrationForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel firstNameLabel;
+    private javax.swing.JTextField firstNameTextField;
+    private javax.swing.JLabel lastNameLabel;
+    private javax.swing.JTextField lastNameTextField;
     private javax.swing.JPanel mainBackgroundRegister;
     private javax.swing.JPanel mainBackgroundRegister2;
     // End of variables declaration//GEN-END:variables
