@@ -28,6 +28,7 @@ public class LoginFrame extends javax.swing.JFrame {
 
         mainBackgroundPanel = new javax.swing.JPanel();
         mainBackgroundPanel2 = new javax.swing.JPanel();
+        logoPictureLabel = new javax.swing.JLabel();
         tastManagerTitle = new javax.swing.JLabel();
         emailTextLabel = new javax.swing.JLabel();
         emailTextField = new javax.swing.JTextField();
@@ -37,7 +38,7 @@ public class LoginFrame extends javax.swing.JFrame {
         signInButton = new javax.swing.JButton();
         signInWithGoogleButton = new javax.swing.JButton();
         dontHaveAnAccountYetTextLabel = new javax.swing.JLabel();
-        logoPictureLabel = new javax.swing.JLabel();
+        coverPictureLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -47,6 +48,7 @@ public class LoginFrame extends javax.swing.JFrame {
 
         mainBackgroundPanel2.setBackground(new java.awt.Color(249, 239, 196));
         mainBackgroundPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        mainBackgroundPanel2.add(logoPictureLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, 40, 40));
 
         tastManagerTitle.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         tastManagerTitle.setForeground(new java.awt.Color(0, 0, 0));
@@ -77,7 +79,6 @@ public class LoginFrame extends javax.swing.JFrame {
         passwordField.setBackground(new java.awt.Color(204, 204, 204));
         passwordField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         passwordField.setForeground(new java.awt.Color(0, 0, 0));
-        passwordField.setText("jPasswordField1");
         passwordField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 passwordFieldActionPerformed(evt);
@@ -117,8 +118,8 @@ public class LoginFrame extends javax.swing.JFrame {
         dontHaveAnAccountYetTextLabel.setText("Don't have an account yet?");
         mainBackgroundPanel2.add(dontHaveAnAccountYetTextLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 150, -1));
 
-        logoPictureLabel.setMaximumSize(new java.awt.Dimension(40, 40));
-        mainBackgroundPanel2.add(logoPictureLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 70, 300, 290));
+        coverPictureLabel.setMaximumSize(new java.awt.Dimension(40, 40));
+        mainBackgroundPanel2.add(coverPictureLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 70, 300, 290));
 
         mainBackgroundPanel.add(mainBackgroundPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(35, 32, 740, 420));
 
@@ -182,6 +183,7 @@ public class LoginFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox checkBoxRememberMe;
+    private javax.swing.JLabel coverPictureLabel;
     private javax.swing.JLabel dontHaveAnAccountYetTextLabel;
     private javax.swing.JTextField emailTextField;
     private javax.swing.JLabel emailTextLabel;
