@@ -4,7 +4,8 @@
  */
 package com.mycompany.cs26finalproject;
 import java.sql.SQLException;
-import java.sql.Connection;
+import java.sql.*;
+import javax.swing.JOptionPane;
 /**
  *
  * @author dionardvale
@@ -32,17 +33,17 @@ public class RegistrationForm extends javax.swing.JFrame {
         firstNameLabel = new javax.swing.JLabel();
         firstNameTextField = new javax.swing.JTextField();
         lastNameLabel = new javax.swing.JLabel();
-        lastNameTextField = new javax.swing.JTextField();
         emailLabel = new javax.swing.JLabel();
         emailTextField = new javax.swing.JTextField();
         passwordLabel = new javax.swing.JLabel();
-        passwordInputTextField = new javax.swing.JPasswordField();
+        confirmPasswordTextField = new javax.swing.JPasswordField();
         signInRegisterButton = new javax.swing.JButton();
         createAccountLabel = new javax.swing.JLabel();
         confirmPasswordLabel = new javax.swing.JLabel();
-        lastNameTextField1 = new javax.swing.JTextField();
-        usernameTextfield = new javax.swing.JTextField();
+        lastNameTextField = new javax.swing.JTextField();
+        userNameTextField = new javax.swing.JTextField();
         usernameLabel = new javax.swing.JLabel();
+        passwordTextField1 = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -66,10 +67,6 @@ public class RegistrationForm extends javax.swing.JFrame {
         lastNameLabel.setText("Last Name");
         mainBackgroundRegister2.add(lastNameLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 180, 100, -1));
 
-        lastNameTextField.setBackground(new java.awt.Color(204, 204, 204));
-        lastNameTextField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        mainBackgroundRegister2.add(lastNameTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 290, 220, -1));
-
         emailLabel.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         emailLabel.setText("Email");
         mainBackgroundRegister2.add(emailLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 100, 50, -1));
@@ -87,19 +84,24 @@ public class RegistrationForm extends javax.swing.JFrame {
         passwordLabel.setText("Password");
         mainBackgroundRegister2.add(passwordLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 180, -1, -1));
 
-        passwordInputTextField.setBackground(new java.awt.Color(204, 204, 204));
-        passwordInputTextField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        passwordInputTextField.addActionListener(new java.awt.event.ActionListener() {
+        confirmPasswordTextField.setBackground(new java.awt.Color(204, 204, 204));
+        confirmPasswordTextField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        confirmPasswordTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                passwordInputTextFieldActionPerformed(evt);
+                confirmPasswordTextFieldActionPerformed(evt);
             }
         });
-        mainBackgroundRegister2.add(passwordInputTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 210, 220, -1));
+        mainBackgroundRegister2.add(confirmPasswordTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 290, 220, -1));
 
         signInRegisterButton.setBackground(new java.awt.Color(0, 102, 153));
         signInRegisterButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         signInRegisterButton.setForeground(new java.awt.Color(255, 255, 255));
         signInRegisterButton.setText("Sign Up");
+        signInRegisterButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                signInRegisterButtonActionPerformed(evt);
+            }
+        });
         mainBackgroundRegister2.add(signInRegisterButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 370, 220, 30));
 
         createAccountLabel.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
@@ -110,17 +112,26 @@ public class RegistrationForm extends javax.swing.JFrame {
         confirmPasswordLabel.setText("Confirm Password");
         mainBackgroundRegister2.add(confirmPasswordLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 260, -1, -1));
 
-        lastNameTextField1.setBackground(new java.awt.Color(204, 204, 204));
-        lastNameTextField1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        mainBackgroundRegister2.add(lastNameTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 210, 220, -1));
+        lastNameTextField.setBackground(new java.awt.Color(204, 204, 204));
+        lastNameTextField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        mainBackgroundRegister2.add(lastNameTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 210, 220, -1));
 
-        usernameTextfield.setBackground(new java.awt.Color(204, 204, 204));
-        usernameTextfield.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        mainBackgroundRegister2.add(usernameTextfield, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 290, 220, -1));
+        userNameTextField.setBackground(new java.awt.Color(204, 204, 204));
+        userNameTextField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        mainBackgroundRegister2.add(userNameTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 290, 220, -1));
 
         usernameLabel.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         usernameLabel.setText("Username");
         mainBackgroundRegister2.add(usernameLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 260, -1, -1));
+
+        passwordTextField1.setBackground(new java.awt.Color(204, 204, 204));
+        passwordTextField1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        passwordTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                passwordTextField1ActionPerformed(evt);
+            }
+        });
+        mainBackgroundRegister2.add(passwordTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 210, 220, -1));
 
         mainBackgroundRegister.add(mainBackgroundRegister2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, 740, 420));
 
@@ -129,13 +140,66 @@ public class RegistrationForm extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void passwordInputTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordInputTextFieldActionPerformed
+    private void confirmPasswordTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmPasswordTextFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_passwordInputTextFieldActionPerformed
+    }//GEN-LAST:event_confirmPasswordTextFieldActionPerformed
 
     private void emailTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailTextFieldActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_emailTextFieldActionPerformed
+
+    private void signInRegisterButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signInRegisterButtonActionPerformed
+        String firstName = firstNameTextField.getText();
+        String lastName = lastNameTextField.getText();
+        String email = emailTextField.getText();
+        String userName = userNameTextField.getText();
+        char[] password = confirmPasswordTextField.getPassword();
+        String passwordStr = new String(password);
+        char[] confirmPassword = confirmPasswordTextField.getPassword();
+        String confirmPasswordStr = new String(confirmPassword);    
+        insertUserData(firstName, lastName, email, userName, passwordStr);
+    }//GEN-LAST:event_signInRegisterButtonActionPerformed
+    private void insertUserData(String firstName, String lastName, String email, String userName, String password) {
+        // Assuming you have a Connector class for database connection
+        Connection conn = DatabaseConnector.getConnection();
+        
+        if (conn != null) {
+            String query = "INSERT INTO users (firstName, lastName, email, userName, password) VALUES (?, ?, ?, ?, ?)";
+            
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                // Set values for the placeholders in the query
+                stmt.setString(1, firstName);
+                stmt.setString(2, lastName);
+                stmt.setString(3, email);
+                stmt.setString(4, userName);
+                stmt.setString(5, password);
+                
+                // Execute the query
+                int rowsAffected = stmt.executeUpdate();
+                
+                // Check if the insert was successful
+                if (rowsAffected > 0) {
+                    JOptionPane.showMessageDialog(this, "Data inserted successfully!");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Error inserting data.");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            } finally {
+                try {
+                    conn.close(); // Close the connection after the operation
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+   
+    
+    private void passwordTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_passwordTextField1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -191,6 +255,7 @@ public class RegistrationForm extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel confirmPasswordLabel;
+    private javax.swing.JPasswordField confirmPasswordTextField;
     private javax.swing.JLabel createAccountLabel;
     private javax.swing.JLabel emailLabel;
     private javax.swing.JTextField emailTextField;
@@ -198,13 +263,12 @@ public class RegistrationForm extends javax.swing.JFrame {
     private javax.swing.JTextField firstNameTextField;
     private javax.swing.JLabel lastNameLabel;
     private javax.swing.JTextField lastNameTextField;
-    private javax.swing.JTextField lastNameTextField1;
     private javax.swing.JPanel mainBackgroundRegister;
     private javax.swing.JPanel mainBackgroundRegister2;
-    private javax.swing.JPasswordField passwordInputTextField;
     private javax.swing.JLabel passwordLabel;
+    private javax.swing.JPasswordField passwordTextField1;
     private javax.swing.JButton signInRegisterButton;
+    private javax.swing.JTextField userNameTextField;
     private javax.swing.JLabel usernameLabel;
-    private javax.swing.JTextField usernameTextfield;
     // End of variables declaration//GEN-END:variables
 }

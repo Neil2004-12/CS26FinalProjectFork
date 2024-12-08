@@ -5,8 +5,7 @@ import java.awt.*;
 import java.util.HashMap;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.SQLException;
-import java.sql.Connection;
+import java.sql.*;
 
 public class MainDashboard {
     GridBagConstraints gbc = new GridBagConstraints();

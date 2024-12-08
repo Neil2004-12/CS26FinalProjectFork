@@ -10,8 +10,7 @@ package com.mycompany.cs26finalproject;
  * @author dionardvale
  */
 
-import java.sql.SQLException;
-import java.sql.Connection;
+import java.sql.*;
 
 public class LoginFrame extends javax.swing.JFrame {
 //set comment
