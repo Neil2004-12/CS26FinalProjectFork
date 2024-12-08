@@ -120,7 +120,7 @@ public class LoginFrame extends javax.swing.JFrame {
         logoPictureLabel.setMaximumSize(new java.awt.Dimension(40, 40));
         mainBackgroundPanel2.add(logoPictureLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 70, 300, 290));
 
-        mainBackgroundPanel.add(mainBackgroundPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(25, 22, 760, 440));
+        mainBackgroundPanel.add(mainBackgroundPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(35, 32, 740, 420));
 
         getContentPane().add(mainBackgroundPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 810, 480));
 
