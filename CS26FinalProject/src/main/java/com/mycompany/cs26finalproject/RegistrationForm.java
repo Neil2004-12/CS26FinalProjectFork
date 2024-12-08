@@ -157,15 +157,18 @@ public class RegistrationForm extends javax.swing.JFrame {
         String passwordStr = new String(password);
         char[] confirmPassword = confirmPasswordTextField.getPassword();
         String confirmPasswordStr = new String(confirmPassword);   
-        
-        if (passwordStr == null || confirmPasswordStr == null || passwordStr.trim().isEmpty() || confirmPasswordStr.trim().isEmpty()) {
+        // Check if any required fields are empty
+        if (firstName.trim().isEmpty() || lastName.trim().isEmpty() || email.trim().isEmpty() || userName.trim().isEmpty() || passwordStr.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Fill up all fields");
+        } else if (passwordStr == null || confirmPasswordStr == null || passwordStr.trim().isEmpty() || confirmPasswordStr.trim().isEmpty()) {
+        // Check if passwords are entered
             JOptionPane.showMessageDialog(this, "Please enter both passwords.");
         } else if (!passwordStr.trim().equals(confirmPasswordStr.trim())) {
+        // Check if passwords match
             JOptionPane.showMessageDialog(this, "Passwords do not match");
         } else {
+        // If all validations pass, insert user data
             insertUserData(firstName, lastName, email, userName, passwordStr);
-            System.out.println("Password: [" + passwordStr + "]");
-            System.out.println("Confirm Password: [" + confirmPasswordStr + "]");
         }
 
         

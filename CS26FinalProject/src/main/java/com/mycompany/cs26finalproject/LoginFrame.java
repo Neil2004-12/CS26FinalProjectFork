@@ -11,6 +11,9 @@ package com.mycompany.cs26finalproject;
  */
 
 import java.sql.*;
+import javax.swing.JOptionPane;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class LoginFrame extends javax.swing.JFrame {
 //set comment
@@ -53,18 +56,15 @@ public class LoginFrame extends javax.swing.JFrame {
         mainBackgroundPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         tastManagerTitle.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        tastManagerTitle.setForeground(new java.awt.Color(0, 0, 0));
         tastManagerTitle.setText("Task Manager");
         mainBackgroundPanel2.add(tastManagerTitle, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 30, 169, -1));
 
         emailTextLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        emailTextLabel.setForeground(new java.awt.Color(0, 0, 0));
         emailTextLabel.setText("Email");
         mainBackgroundPanel2.add(emailTextLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 100, 60, 20));
 
         emailTextField.setBackground(new java.awt.Color(204, 204, 204));
         emailTextField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        emailTextField.setForeground(new java.awt.Color(0, 0, 0));
         emailTextField.setText("Enter your Email");
         emailTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -74,13 +74,11 @@ public class LoginFrame extends javax.swing.JFrame {
         mainBackgroundPanel2.add(emailTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 130, 270, 30));
 
         passwordTextLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        passwordTextLabel.setForeground(new java.awt.Color(0, 0, 0));
         passwordTextLabel.setText("Password");
         mainBackgroundPanel2.add(passwordTextLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 180, -1, -1));
 
         passwordField.setBackground(new java.awt.Color(204, 204, 204));
         passwordField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        passwordField.setForeground(new java.awt.Color(0, 0, 0));
         passwordField.setText("jPasswordField1");
         passwordField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -90,7 +88,6 @@ public class LoginFrame extends javax.swing.JFrame {
         mainBackgroundPanel2.add(passwordField, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 210, 270, 30));
 
         checkBoxRememberMe.setBackground(new java.awt.Color(249, 239, 196));
-        checkBoxRememberMe.setForeground(new java.awt.Color(0, 0, 0));
         checkBoxRememberMe.setText("Remember Me");
         checkBoxRememberMe.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -103,11 +100,15 @@ public class LoginFrame extends javax.swing.JFrame {
         signInButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         signInButton.setForeground(new java.awt.Color(255, 255, 255));
         signInButton.setText("Sign In");
+        signInButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                signInButtonActionPerformed(evt);
+            }
+        });
         mainBackgroundPanel2.add(signInButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 313, 270, 30));
 
         signInWithGoogleButton.setBackground(new java.awt.Color(204, 204, 204));
         signInWithGoogleButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        signInWithGoogleButton.setForeground(new java.awt.Color(0, 0, 0));
         signInWithGoogleButton.setText("Sign In with Google");
         signInWithGoogleButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -117,7 +118,6 @@ public class LoginFrame extends javax.swing.JFrame {
         mainBackgroundPanel2.add(signInWithGoogleButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 350, 270, 30));
 
         dontHaveAnAccountYetTextLabel.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
-        dontHaveAnAccountYetTextLabel.setForeground(new java.awt.Color(0, 0, 0));
         dontHaveAnAccountYetTextLabel.setText("Don't have an account yet?");
         mainBackgroundPanel2.add(dontHaveAnAccountYetTextLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 150, -1));
 
@@ -148,6 +148,91 @@ public class LoginFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_checkBoxRememberMeActionPerformed
 
+    private void signInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signInButtonActionPerformed
+       String email = emailTextField.getText();
+       char[] password = passwordField.getPassword();
+       String passwordStr = new String(password);
+       
+       // Check if any required fields are empty
+        if (email.trim().isEmpty() || passwordStr.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Fill up all fields");
+        } else {
+        // If all validations pass, insert user data
+            checkUserData(email, passwordStr);
+        }
+    }//GEN-LAST:event_signInButtonActionPerformed
+    private void checkUserData(String email, String passwordStr) {
+        // Assuming you have a Connector class for database connection
+        Connection conn = DatabaseConnector.getConnection();
+    
+        if (conn == null) {
+            JOptionPane.showMessageDialog(this, "Database connection failed.");
+            return;
+        }
+
+        try {
+            // Prepare a SQL query to get the stored password hash for the user
+            String query = "SELECT password FROM users WHERE email = ?";
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setString(1, email);  // Set the email in the query
+        
+            // Execute the query
+            ResultSet rs = ps.executeQuery();
+        
+            if (rs.next()) {
+                // User exists, get the stored hashed password
+                String storedPasswordHash = rs.getString("password");
+            
+                // Hash the entered password using SHA-256
+                String hashedPassword = hashPassword(passwordStr);
+            
+                // Check if the provided password hash matches the stored hash
+                if (hashedPassword.equals(storedPasswordHash)) {
+                    // Password matches, login successful
+                    JOptionPane.showMessageDialog(this, "Login successful!");
+                    MainDashboard dashboard = new MainDashboard();
+                } else {
+                    // Password doesn't match
+                    JOptionPane.showMessageDialog(this, "Invalid password. Please try again.");
+                }
+            } else {
+                // No user found with the provided email
+                JOptionPane.showMessageDialog(this, "No user found with this email.");
+            }
+        
+        } catch (SQLException e) {
+            // Handle any database-related exceptions
+            JOptionPane.showMessageDialog(this, "Error checking user data: " + e.getMessage());
+        } finally {
+            // Always close the connection
+            try {
+                if (conn != null && !conn.isClosed()) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Error closing the database connection: " + e.getMessage());
+            }
+        }
+    }
+
+    // Method to hash the password using SHA-256
+    private String hashPassword(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(password.getBytes());
+        
+            // Convert byte array into a hexadecimal string
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hashBytes) {
+                hexString.append(String.format("%02x", b));
+                }
+        return hexString.toString(); // Return the hashed password as a hex string
+        } catch (NoSuchAlgorithmException e) {
+            JOptionPane.showMessageDialog(this, "Error hashing password: " + e.getMessage());
+            return null;
+        }
+    }
+    
     /**
      * @param args the command line arguments
      */
