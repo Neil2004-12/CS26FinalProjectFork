@@ -4,10 +4,15 @@
  */
 package com.mycompany.cs26finalproject;
 
+
 /**
- *
+ * 
  * @author dionardvale
  */
+
+import java.sql.SQLException;
+import java.sql.Connection;
+
 public class LoginFrame extends javax.swing.JFrame {
 //set comment
     /**
@@ -148,6 +153,24 @@ public class LoginFrame extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        
+        // Call the getConnection method from DatabaseConnector class
+        Connection connection = DatabaseConnector.getConnection();
+
+        // Now you can use the 'connection' object to interact with the database
+        if (connection != null) {
+            try {
+                // Do your database operations here
+                System.out.println("Database connected, performing operations...");
+
+                // Close the connection when you're done
+                connection.close();
+                System.out.println("Connection closed successfully!");
+
+            } catch (SQLException e) {
+                System.out.println("Error during operations: " + e.getMessage());
+            }
+        }
         //MainDashboard.main(args);
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

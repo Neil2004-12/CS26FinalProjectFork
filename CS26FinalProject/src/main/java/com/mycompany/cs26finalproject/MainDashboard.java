@@ -5,6 +5,8 @@ import java.awt.*;
 import java.util.HashMap;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
+import java.sql.Connection;
 
 public class MainDashboard {
     GridBagConstraints gbc = new GridBagConstraints();
@@ -236,6 +238,23 @@ public class MainDashboard {
     }
 
     public static void main(String[] args) {
+        // Call the getConnection method from DatabaseConnector class
+        Connection connection = DatabaseConnector.getConnection();
+
+        // Now you can use the 'connection' object to interact with the database
+        if (connection != null) {
+            try {
+                // Do your database operations here
+                System.out.println("Database connected, performing operations...");
+
+                // Close the connection when you're done
+                connection.close();
+                System.out.println("Connection closed successfully!");
+
+            } catch (SQLException e) {
+                System.out.println("Error during operations: " + e.getMessage());
+            }
+        }
         MainDashboard dash = new MainDashboard();
     }
 }
