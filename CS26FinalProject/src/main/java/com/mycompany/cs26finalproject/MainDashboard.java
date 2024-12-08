@@ -3,6 +3,8 @@ package com.mycompany.cs26finalproject;
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class MainDashboard {
     GridBagConstraints gbc = new GridBagConstraints();
@@ -194,10 +196,42 @@ public class MainDashboard {
         taskCard.setPreferredSize(new Dimension(200, 50));
         taskCard.setHorizontalAlignment(SwingConstants.CENTER);
 
+        taskCard.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                showTaskDetails(taskName);
+            }
+        });
+
+        taskPanel.add(taskCard);
+        taskPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+    
         taskPanel.add(taskCard);
         taskPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Add spacing between tasks
     }
+    
+    private void showTaskDetails(String taskName) {
+        JDialog taskDialog = new JDialog();
+        taskDialog.setTitle("Task Details");
+        taskDialog.setSize(400, 300);
+        taskDialog.setLayout(new BorderLayout());
 
+        JLabel taskNameLabel = new JLabel("Task: " + taskName);
+        taskNameLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        taskDialog.add(taskNameLabel, BorderLayout.NORTH);
+
+        JTextArea taskDescription = new JTextArea();
+        taskDescription.setLineWrap(true);
+        taskDescription.setWrapStyleWord(true);
+        JScrollPane descriptionScrollPane = new JScrollPane(taskDescription);
+        taskDialog.add(descriptionScrollPane, BorderLayout.CENTER);
+
+        JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(e -> taskDialog.dispose());
+        taskDialog.add(saveButton, BorderLayout.SOUTH);
+
+        taskDialog.setVisible(true);
+    }
     public static void main(String[] args) {
         MainDashboard dash = new MainDashboard();
     }
