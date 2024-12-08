@@ -204,11 +204,9 @@ public class MainDashboard {
         });
 
         taskPanel.add(taskCard);
-        taskPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-    
-        taskPanel.add(taskCard);
         taskPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Add spacing between tasks
     }
+
     
     private void showTaskDetails(String taskName) {
         JDialog taskDialog = new JDialog();
@@ -220,18 +218,23 @@ public class MainDashboard {
         taskNameLabel.setFont(new Font("Arial", Font.BOLD, 18));
         taskDialog.add(taskNameLabel, BorderLayout.NORTH);
 
-        JTextArea taskDescription = new JTextArea();
+        JTextArea taskDescription = new JTextArea("Enter task details here...");
         taskDescription.setLineWrap(true);
         taskDescription.setWrapStyleWord(true);
         JScrollPane descriptionScrollPane = new JScrollPane(taskDescription);
         taskDialog.add(descriptionScrollPane, BorderLayout.CENTER);
 
         JButton saveButton = new JButton("Save");
-        saveButton.addActionListener(e -> taskDialog.dispose());
-        taskDialog.add(saveButton, BorderLayout.SOUTH);
+        saveButton.addActionListener(e -> {
+            String taskDetails = taskDescription.getText();
+            System.out.println("Task Details Saved: " + taskDetails); // Replace with database saving logic
+            taskDialog.dispose();
+        });
 
+        taskDialog.add(saveButton, BorderLayout.SOUTH);
         taskDialog.setVisible(true);
     }
+
     public static void main(String[] args) {
         MainDashboard dash = new MainDashboard();
     }

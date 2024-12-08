@@ -136,7 +136,8 @@ public class LoginFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_passwordFieldActionPerformed
 
     private void signInWithGoogleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signInWithGoogleButtonActionPerformed
-        // TODO add your handling code here:
+        new RegistrationForm().setVisible(true);
+        
     }//GEN-LAST:event_signInWithGoogleButtonActionPerformed
 
     private void checkBoxRememberMeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxRememberMeActionPerformed
@@ -147,7 +148,7 @@ public class LoginFrame extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        MainDashboard.main(args);
+        //MainDashboard.main(args);
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -175,7 +176,7 @@ public class LoginFrame extends javax.swing.JFrame {
             //todo: change to LoginFrame once done with testing
             public void run() {
                 //to do: uncomment after testing
-                //new LoginFrame().setVisible(true);
+                new LoginFrame().setVisible(true);
             }
         });
     }
