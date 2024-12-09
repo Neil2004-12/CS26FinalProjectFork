@@ -45,6 +45,7 @@ public class LoginFrame extends javax.swing.JFrame {
         signInWithGoogleButton = new javax.swing.JButton();
         dontHaveAnAccountYetTextLabel = new javax.swing.JLabel();
         logoPictureLabel = new javax.swing.JLabel();
+        dontHaveAnAccountYetTextLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -118,11 +119,15 @@ public class LoginFrame extends javax.swing.JFrame {
         mainBackgroundPanel2.add(signInWithGoogleButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 350, 270, 30));
 
         dontHaveAnAccountYetTextLabel.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
-        dontHaveAnAccountYetTextLabel.setText("Don't have an account yet?");
-        mainBackgroundPanel2.add(dontHaveAnAccountYetTextLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 150, -1));
+        dontHaveAnAccountYetTextLabel.setText("click here");
+        mainBackgroundPanel2.add(dontHaveAnAccountYetTextLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 390, 50, -1));
 
         logoPictureLabel.setMaximumSize(new java.awt.Dimension(40, 40));
         mainBackgroundPanel2.add(logoPictureLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 70, 300, 290));
+
+        dontHaveAnAccountYetTextLabel1.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        dontHaveAnAccountYetTextLabel1.setText("Don't have an account yet?");
+        mainBackgroundPanel2.add(dontHaveAnAccountYetTextLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 150, -1));
 
         mainBackgroundPanel.add(mainBackgroundPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(35, 32, 740, 420));
 
@@ -291,6 +296,7 @@ public class LoginFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox checkBoxRememberMe;
     private javax.swing.JLabel dontHaveAnAccountYetTextLabel;
+    private javax.swing.JLabel dontHaveAnAccountYetTextLabel1;
     private javax.swing.JTextField emailTextField;
     private javax.swing.JLabel emailTextLabel;
     private javax.swing.JLabel logoPictureLabel;
