@@ -118,6 +118,11 @@ public class RegistrationForm extends javax.swing.JFrame {
 
         userNameTextField.setBackground(new java.awt.Color(204, 204, 204));
         userNameTextField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        userNameTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                userNameTextFieldActionPerformed(evt);
+            }
+        });
         mainBackgroundRegister2.add(userNameTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 290, 220, -1));
 
         usernameLabel.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -156,23 +161,85 @@ public class RegistrationForm extends javax.swing.JFrame {
         char[] password = passwordTextField.getPassword();
         String passwordStr = new String(password);
         char[] confirmPassword = confirmPasswordTextField.getPassword();
-        String confirmPasswordStr = new String(confirmPassword);   
-        // Check if any required fields are empty
-        if (firstName.trim().isEmpty() || lastName.trim().isEmpty() || email.trim().isEmpty() || userName.trim().isEmpty() || passwordStr.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Fill up all fields");
-        } else if (passwordStr == null || confirmPasswordStr == null || passwordStr.trim().isEmpty() || confirmPasswordStr.trim().isEmpty()) {
-        // Check if passwords are entered
-            JOptionPane.showMessageDialog(this, "Please enter both passwords.");
-        } else if (!passwordStr.trim().equals(confirmPasswordStr.trim())) {
-        // Check if passwords match
-            JOptionPane.showMessageDialog(this, "Passwords do not match");
-        } else {
-        // If all validations pass, insert user data
-            insertUserData(firstName, lastName, email, userName, passwordStr);
-        }
-
+        String confirmPasswordStr = new String(confirmPassword);  
         
+        if (duplicateChecker(email, userName)) {
+            JOptionPane.showMessageDialog(this, "Account already exists. Please enter a different username/email.");
+        } else {
+            // Check if any required fields are empty
+            if (firstName.trim().isEmpty() || lastName.trim().isEmpty() || email.trim().isEmpty() || userName.trim().isEmpty() || passwordStr.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Fill up all fields");
+            } else if (passwordStr == null || confirmPasswordStr == null || passwordStr.trim().isEmpty() || confirmPasswordStr.trim().isEmpty()) {
+            // Check if passwords are entered
+                JOptionPane.showMessageDialog(this, "Please enter both passwords.");
+            } else if (!passwordStr.trim().equals(confirmPasswordStr.trim())) {
+            // Check if passwords match
+                JOptionPane.showMessageDialog(this, "Passwords do not match");
+            } else {
+            // If all validations pass, insert user data
+                insertUserData(firstName, lastName, email, userName, passwordStr);
+            }  
+        }
+        
+          
     }//GEN-LAST:event_signInRegisterButtonActionPerformed
+    private Boolean duplicateChecker (String email, String userName) {
+        Connection conn = DatabaseConnector.getConnection();
+        Boolean flag1 = false;
+        Boolean flag2 = false;
+        
+        // checks if email is unique
+        if (conn != null) {
+            String query = "SELECT email FROM users WHERE email = ?";
+            
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                // Set values for the placeholders in the query
+                stmt.setString(1, email);
+                
+                // Execute the query
+                ResultSet rs = stmt.executeQuery();
+                
+                if (rs.next()) {
+                    flag1 = true;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            } 
+        }
+        
+        //checks if username is unique
+        if (conn != null) {
+            String query = "SELECT userName FROM users WHERE userName = ?";
+            
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                // Set values for the placeholders in the query
+                stmt.setString(1, userName);
+                
+                // Execute the query
+                ResultSet rs = stmt.executeQuery();
+                
+                if (rs.next()) {
+                    flag2 = true;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            } finally {
+                try {
+                    conn.close(); // Close the connection after the operation
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        
+        if (flag1 == true || flag2 == true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     private void insertUserData(String firstName, String lastName, String email, String userName, String password) {
         // Assuming you have a Connector class for database connection
         Connection conn = DatabaseConnector.getConnection();
@@ -214,6 +281,10 @@ public class RegistrationForm extends javax.swing.JFrame {
     private void passwordTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordTextFieldActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_passwordTextFieldActionPerformed
+
+    private void userNameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userNameTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_userNameTextFieldActionPerformed
 
     /**
      * @param args the command line arguments
