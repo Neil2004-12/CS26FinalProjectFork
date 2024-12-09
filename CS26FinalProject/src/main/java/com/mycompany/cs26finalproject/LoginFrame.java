@@ -120,6 +120,11 @@ public class LoginFrame extends javax.swing.JFrame {
 
         clickHereLabel.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         clickHereLabel.setText("click here");
+        clickHereLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                clickHereLabelMouseClicked(evt);
+            }
+        });
         mainBackgroundPanel2.add(clickHereLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 390, 50, -1));
 
         logoPictureLabel.setMaximumSize(new java.awt.Dimension(40, 40));
@@ -145,7 +150,7 @@ public class LoginFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_passwordFieldActionPerformed
 
     private void signInWithGoogleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signInWithGoogleButtonActionPerformed
-        new RegistrationForm().setVisible(true);
+        
         
     }//GEN-LAST:event_signInWithGoogleButtonActionPerformed
 
@@ -166,6 +171,10 @@ public class LoginFrame extends javax.swing.JFrame {
             checkUserData(email, passwordStr);
         }
     }//GEN-LAST:event_signInButtonActionPerformed
+
+    private void clickHereLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_clickHereLabelMouseClicked
+        new RegistrationForm().setVisible(true);
+    }//GEN-LAST:event_clickHereLabelMouseClicked
     private void checkUserData(String email, String passwordStr) {
         // Assuming you have a Connector class for database connection
         Connection conn = DatabaseConnector.getConnection();
