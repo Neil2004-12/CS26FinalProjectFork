@@ -182,7 +182,7 @@ public class MainDashboard {
         }
     }
 
-    private void addKanbanColumn(JPanel kanbanContent, String columnName) {
+    private void addKanbanColumn(JPanel kanbanContent, String columnName, int listID) {
         GridBagConstraints columnGbc = new GridBagConstraints();
         columnGbc.fill = GridBagConstraints.BOTH;
         columnGbc.gridy = 0;
@@ -209,7 +209,9 @@ public class MainDashboard {
         taskScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         taskScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         columnPanel.add(taskScrollPane, BorderLayout.CENTER);
-
+        
+        loadTasksFromDatabase(taskPanel, listID);
+        
         JButton addTaskButton = new JButton("Add Task");
         addTaskButton.addActionListener(e -> {
             String taskName = JOptionPane.showInputDialog(kanbanContent, "Enter task name:");
@@ -224,7 +226,24 @@ public class MainDashboard {
         kanbanContent.revalidate();
         kanbanContent.repaint();
     }
+    
+    private void loadTasksFromDatabase(JPanel taskPanel, int listID) {
+        try (Connection connection = DatabaseConnector.getConnection();
+            PreparedStatement stmt = connection.prepareStatement("SELECT taskName FROM tasks WHERE listID = ?")) {
 
+            stmt.setInt(1, listID);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                String taskName = rs.getString("taskName");
+                addTaskToColumn(taskPanel, taskName); // Add task to the column UI
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to load tasks from database.");
+        }
+    }
+    
     private void addTaskToDatabase(String listName, String taskName) {
         try (Connection connection = DatabaseConnector.getConnection();
              PreparedStatement stmt = connection.prepareStatement("INSERT INTO tasks (taskName, listID) VALUES (?, (SELECT id FROM lists WHERE listName = ? AND projectID IN (SELECT id FROM projects WHERE userID = ?)))")) {
