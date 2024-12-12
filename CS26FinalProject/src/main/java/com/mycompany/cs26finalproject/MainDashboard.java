@@ -10,8 +10,12 @@ public class MainDashboard {
     private JPanel projectListPanel; // Panel for the list of projects
     private ButtonGroup projectButtonGroup; // Button group for project radio buttons
     private JPanel mainContent; // Kanban board area
+    private int userID;
+    private int currentUserID; // The logged-in user's ID
 
-    public MainDashboard() {
+    public MainDashboard(int userID) {
+        this.currentUserID = userID;
+
         JFrame dashboard = new JFrame();
         dashboard.setTitle("Kanban Dashboard");
         dashboard.setLayout(new GridBagLayout());
@@ -81,8 +85,10 @@ public class MainDashboard {
 
     private void loadProjectsFromDatabase() {
         try (Connection connection = DatabaseConnector.getConnection();
-             Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT projectName FROM projects")) {
+             PreparedStatement stmt = connection.prepareStatement("SELECT projectName FROM projects WHERE userID = ?")) {
+
+            stmt.setInt(1, currentUserID);
+            ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
                 String projectName = rs.getString("projectName");
@@ -96,9 +102,10 @@ public class MainDashboard {
 
     private void addProjectToDatabase(String projectName) {
         try (Connection connection = DatabaseConnector.getConnection();
-             PreparedStatement stmt = connection.prepareStatement("INSERT INTO projects (projectName) VALUES (?)")) {
+             PreparedStatement stmt = connection.prepareStatement("INSERT INTO projects (projectName, userID) VALUES (?, ?)");) {
 
             stmt.setString(1, projectName);
+            stmt.setInt(2, currentUserID);
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -142,9 +149,10 @@ public class MainDashboard {
         JPanel kanbanBoard = new JPanel(new GridBagLayout());
 
         try (Connection connection = DatabaseConnector.getConnection();
-             PreparedStatement stmt = connection.prepareStatement("SELECT listName FROM lists WHERE projectID = (SELECT id FROM projects WHERE projectName = ?)");) {
+             PreparedStatement stmt = connection.prepareStatement("SELECT listName FROM lists WHERE projectID = (SELECT id FROM projects WHERE projectName = ? AND userID = ?)");) {
 
             stmt.setString(1, projectName);
+            stmt.setInt(2, currentUserID);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -161,10 +169,11 @@ public class MainDashboard {
 
     private void addListToDatabase(String projectName, String listName) {
         try (Connection connection = DatabaseConnector.getConnection();
-             PreparedStatement stmt = connection.prepareStatement("INSERT INTO lists (listName, projectID) VALUES (?, (SELECT id FROM projects WHERE projectName = ?))")) {
+             PreparedStatement stmt = connection.prepareStatement("INSERT INTO lists (listName, projectID) VALUES (?, (SELECT id FROM projects WHERE projectName = ? AND userID = ?))")) {
 
             stmt.setString(1, listName);
             stmt.setString(2, projectName);
+            stmt.setInt(3, currentUserID);
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -217,10 +226,11 @@ public class MainDashboard {
 
     private void addTaskToDatabase(String listName, String taskName) {
         try (Connection connection = DatabaseConnector.getConnection();
-             PreparedStatement stmt = connection.prepareStatement("INSERT INTO tasks (taskName, listID) VALUES (?, (SELECT id FROM lists WHERE listName = ?))")) {
+             PreparedStatement stmt = connection.prepareStatement("INSERT INTO tasks (taskName, listID) VALUES (?, (SELECT id FROM lists WHERE listName = ? AND projectID IN (SELECT id FROM projects WHERE userID = ?)))")) {
 
             stmt.setString(1, taskName);
             stmt.setString(2, listName);
+            stmt.setInt(3, currentUserID);
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -246,6 +256,13 @@ public class MainDashboard {
     }
 
     public static void main(String[] args) {
-        new MainDashboard();
+        // Assuming the userID is passed as a command-line argument
+        if (args.length > 0) {
+            int userID = Integer.parseInt(args[0]);
+            new MainDashboard(userID);  // Pass userID to the constructor
+        }
     }
+
+    
+
 }
