@@ -9,10 +9,6 @@ import java.sql.*;
 
 public class MainDashboard {
     GridBagConstraints gbc = new GridBagConstraints();
-
-    // Store projects: project name -> Kanban content panel
-    private HashMap<String, JPanel> projects = new HashMap<>();
-    private JPanel kanbanContent; // Active Kanban content area
     private JPanel projectListPanel; // Panel for the list of projects
     private ButtonGroup projectButtonGroup; // Button group for radio buttons
     private JPanel mainContent; // Kanban board area
