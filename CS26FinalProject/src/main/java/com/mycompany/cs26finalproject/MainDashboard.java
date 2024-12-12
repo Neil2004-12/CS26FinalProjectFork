@@ -128,6 +128,7 @@ public class MainDashboard {
         mainContent.removeAll();
         mainContent.setLayout(new BorderLayout());
 
+        // Load the Kanban board and pass the project name
         JPanel kanbanBoard = loadKanbanBoardFromDatabase(projectName);
         mainContent.add(kanbanBoard, BorderLayout.CENTER);
 
@@ -135,8 +136,10 @@ public class MainDashboard {
         addListButton.addActionListener(e -> {
             String listName = JOptionPane.showInputDialog(mainContent, "Enter list name:");
             if (listName != null && !listName.trim().isEmpty()) {
-                addListToDatabase(projectName, listName);
-                addKanbanColumn(kanbanBoard, listName);
+                // Add list to database
+                int listID = addListToDatabase(projectName, listName);
+                // Add the Kanban column (task list) to the UI
+                addKanbanColumn(kanbanBoard, listName, listID);
             }
         });
         mainContent.add(addListButton, BorderLayout.SOUTH);
@@ -145,11 +148,12 @@ public class MainDashboard {
         mainContent.repaint();
     }
 
+
     private JPanel loadKanbanBoardFromDatabase(String projectName) {
         JPanel kanbanBoard = new JPanel(new GridBagLayout());
 
         try (Connection connection = DatabaseConnector.getConnection();
-             PreparedStatement stmt = connection.prepareStatement("SELECT listName FROM lists WHERE projectID = (SELECT id FROM projects WHERE projectName = ? AND userID = ?)");) {
+             PreparedStatement stmt = connection.prepareStatement("SELECT id, listName FROM lists WHERE projectID = (SELECT id FROM projects WHERE projectName = ? AND userID = ?)");) {
 
             stmt.setString(1, projectName);
             stmt.setInt(2, currentUserID);
@@ -168,19 +172,30 @@ public class MainDashboard {
         return kanbanBoard;
     }
 
-    private void addListToDatabase(String projectName, String listName) {
+    private int addListToDatabase(String projectName, String listName) {
+        int listID = -1; // Default value if insertion fails
         try (Connection connection = DatabaseConnector.getConnection();
-             PreparedStatement stmt = connection.prepareStatement("INSERT INTO lists (listName, projectID) VALUES (?, (SELECT id FROM projects WHERE projectName = ? AND userID = ?))")) {
+            PreparedStatement stmt = connection.prepareStatement(
+            "INSERT INTO lists (listName, projectID) VALUES (?, (SELECT id FROM projects WHERE projectName = ? AND userID = ?))",
+            Statement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setString(1, listName);
-            stmt.setString(2, projectName);
-            stmt.setInt(3, currentUserID);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Failed to add list to database.");
-        }
+                stmt.setString(1, listName);
+                stmt.setString(2, projectName);
+                stmt.setInt(3, currentUserID);
+                stmt.executeUpdate();
+                // Get the generated list ID
+                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        listID = generatedKeys.getInt(1);
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Failed to add list to database.");
+            }
+        return listID;
     }
+
 
     private void addKanbanColumn(JPanel kanbanContent, String columnName, int listID) {
         GridBagConstraints columnGbc = new GridBagConstraints();
