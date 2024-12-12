@@ -157,7 +157,8 @@ public class MainDashboard {
 
             while (rs.next()) {
                 String listName = rs.getString("listName");
-                addKanbanColumn(kanbanBoard, listName);
+                int listID = rs.getInt("id");
+                addKanbanColumn(kanbanBoard, listName, listID);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -262,7 +263,4 @@ public class MainDashboard {
             new MainDashboard(userID);  // Pass userID to the constructor
         }
     }
-
-    
-
 }
