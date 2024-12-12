@@ -73,7 +73,10 @@ public class MainDashboard {
         gbc.weightx = 0.8;
         gbc.weighty = 1;
         dashboard.add(mainContent, gbc);
-
+        
+        // Load projects from the database
+        loadProjectsFromDatabase();
+        
         // Add project action
         addProjectButton.addActionListener(e -> {
             String projectName = JOptionPane.showInputDialog(dashboard, "Enter project name:");
@@ -86,7 +89,22 @@ public class MainDashboard {
 
         dashboard.setVisible(true);
     }
+    
+    // Load projects from the database
+    private void loadProjectsFromDatabase() {
+        try (Connection connection = DatabaseConnector.getConnection();
+             Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT name FROM projects")) {
 
+            while (rs.next()) {
+                String projectName = rs.getString("name");
+                addProjectToUI(projectName);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to load projects from database.");
+        }
+    }
     // Method to add a new project
     private void addProject(String projectName) {
         // Create new Kanban panel for the project
