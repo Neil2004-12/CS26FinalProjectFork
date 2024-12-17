@@ -118,7 +118,8 @@ public class LoginFrame extends javax.swing.JFrame {
         });
         mainBackgroundPanel2.add(signInWithGoogleButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 350, 270, 30));
 
-        clickHereLabel.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        clickHereLabel.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        clickHereLabel.setForeground(new java.awt.Color(0, 102, 153));
         clickHereLabel.setText("click here");
         clickHereLabel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -132,7 +133,7 @@ public class LoginFrame extends javax.swing.JFrame {
 
         dontHaveAnAccountYetTextLabel1.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         dontHaveAnAccountYetTextLabel1.setText("Don't have an account yet?");
-        mainBackgroundPanel2.add(dontHaveAnAccountYetTextLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 150, -1));
+        mainBackgroundPanel2.add(dontHaveAnAccountYetTextLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, -1, -1));
 
         mainBackgroundPanel.add(mainBackgroundPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(35, 32, 740, 420));
 

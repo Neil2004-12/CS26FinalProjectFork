@@ -183,6 +183,7 @@ public class RegistrationForm extends javax.swing.JFrame {
         
           
     }//GEN-LAST:event_signInRegisterButtonActionPerformed
+    
     private Boolean duplicateChecker (String email, String userName) {
         Connection conn = DatabaseConnector.getConnection();
         Boolean flag1 = false;
@@ -240,6 +241,7 @@ public class RegistrationForm extends javax.swing.JFrame {
             return false;
         }
     }
+    
     private void insertUserData(String firstName, String lastName, String email, String userName, String password) {
         // Assuming you have a Connector class for database connection
         Connection conn = DatabaseConnector.getConnection();
