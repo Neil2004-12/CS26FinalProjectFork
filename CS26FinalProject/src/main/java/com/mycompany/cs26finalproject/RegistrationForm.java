@@ -44,6 +44,7 @@ public class RegistrationForm extends javax.swing.JFrame {
         userNameTextField = new javax.swing.JTextField();
         usernameLabel = new javax.swing.JLabel();
         passwordTextField = new javax.swing.JPasswordField();
+        arrowBackButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -137,6 +138,16 @@ public class RegistrationForm extends javax.swing.JFrame {
             }
         });
         mainBackgroundRegister2.add(passwordTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 210, 220, -1));
+
+        arrowBackButton.setBackground(new java.awt.Color(204, 204, 204));
+        arrowBackButton.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
+        arrowBackButton.setForeground(new java.awt.Color(255, 255, 255));
+        arrowBackButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                arrowBackButtonActionPerformed(evt);
+            }
+        });
+        mainBackgroundRegister2.add(arrowBackButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 50, 30));
 
         mainBackgroundRegister.add(mainBackgroundRegister2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, 740, 420));
 
@@ -288,6 +299,11 @@ public class RegistrationForm extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_userNameTextFieldActionPerformed
 
+    private void arrowBackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_arrowBackButtonActionPerformed
+        // TODO add your handling code here:
+         new LoginFrame().setVisible(true);
+    }//GEN-LAST:event_arrowBackButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -341,6 +357,7 @@ public class RegistrationForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton arrowBackButton;
     private javax.swing.JLabel confirmPasswordLabel;
     private javax.swing.JPasswordField confirmPasswordTextField;
     private javax.swing.JLabel createAccountLabel;

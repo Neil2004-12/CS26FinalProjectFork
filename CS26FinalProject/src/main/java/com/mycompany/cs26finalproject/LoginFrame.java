@@ -119,7 +119,7 @@ public class LoginFrame extends javax.swing.JFrame {
         mainBackgroundPanel2.add(signInWithGoogleButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 350, 270, 30));
 
         clickHereLabel.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
-        clickHereLabel.setForeground(new java.awt.Color(0, 102, 153));
+        clickHereLabel.setForeground(new java.awt.Color(0, 153, 204));
         clickHereLabel.setText("click here");
         clickHereLabel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
