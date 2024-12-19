@@ -14,6 +14,7 @@ import java.sql.*;
 import javax.swing.JOptionPane;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.prefs.Preferences;
 
 public class LoginFrame extends javax.swing.JFrame {
 //set comment
@@ -151,12 +152,46 @@ public class LoginFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_passwordFieldActionPerformed
 
     private void signInWithGoogleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signInWithGoogleButtonActionPerformed
-        
+        // TODO add your handling code here:
         
     }//GEN-LAST:event_signInWithGoogleButtonActionPerformed
 
     private void checkBoxRememberMeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxRememberMeActionPerformed
         // TODO add your handling code here:
+        // Preferences for storing user credentials
+    Preferences preferences = Preferences.userNodeForPackage(getClass());
+
+    // Check if the checkbox is selected
+    if (checkBoxRememberMe.isSelected()) {
+        // Save email and password
+        String email = emailTextField.getText();
+        String password = new String(passwordField.getPassword());
+        
+        // Save credentials in preferences
+        preferences.put("email", email);
+        preferences.put("password", password);
+
+        // Notify user (optional)
+        System.out.println("Credentials saved!");
+    } else {
+        // Clear saved credentials
+        preferences.remove("email");
+        preferences.remove("password");
+
+        // Notify user (optional)
+        System.out.println("Credentials cleared!");
+    }
+
+    // Load credentials and set the fields and checkbox state
+    String email = preferences.get("email", "");
+    String password = preferences.get("password", "");
+
+    // Pre-fill the email and password fields
+    emailTextField.setText(email);
+    passwordField.setText(password);
+
+    // Update checkbox state
+    checkBoxRememberMe.setSelected(!email.isEmpty() && !password.isEmpty());
     }//GEN-LAST:event_checkBoxRememberMeActionPerformed
 
     private void signInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signInButtonActionPerformed
@@ -174,8 +209,10 @@ public class LoginFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_signInButtonActionPerformed
 
     private void clickHereLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_clickHereLabelMouseClicked
+
         new RegistrationForm().setVisible(true);
     }//GEN-LAST:event_clickHereLabelMouseClicked
+
     private void checkUserData(String email, String passwordStr) {
         // Assuming you have a Connector class for database connection
         Connection conn = DatabaseConnector.getConnection();
