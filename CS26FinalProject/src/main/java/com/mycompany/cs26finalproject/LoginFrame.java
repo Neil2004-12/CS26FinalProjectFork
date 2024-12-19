@@ -209,7 +209,7 @@ public class LoginFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_signInButtonActionPerformed
 
     private void clickHereLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_clickHereLabelMouseClicked
-
+        // TODO add your handling code here:
         new RegistrationForm().setVisible(true);
     }//GEN-LAST:event_clickHereLabelMouseClicked
 

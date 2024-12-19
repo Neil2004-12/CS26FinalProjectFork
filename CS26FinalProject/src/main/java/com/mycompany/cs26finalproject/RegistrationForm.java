@@ -140,16 +140,15 @@ public class RegistrationForm extends javax.swing.JFrame {
         mainBackgroundRegister2.add(passwordTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 210, 220, -1));
 
         arrowBackButton.setBackground(new java.awt.Color(204, 204, 204));
-        arrowBackButton.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
-        arrowBackButton.setForeground(new java.awt.Color(255, 255, 255));
-        arrowBackButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/mycompany/cs26finalproject/re_arrow1.png"))); // NOI18N
-        arrowBackButton.setPressedIcon(new javax.swing.ImageIcon(getClass().getResource("/com/mycompany/cs26finalproject/arrow.png"))); // NOI18N
+        arrowBackButton.setFont(new java.awt.Font("Arial", 1, 10)); // NOI18N
+        arrowBackButton.setForeground(new java.awt.Color(0, 0, 0));
+        arrowBackButton.setText("<BACK");
         arrowBackButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 arrowBackButtonActionPerformed(evt);
             }
         });
-        mainBackgroundRegister2.add(arrowBackButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 40, 30));
+        mainBackgroundRegister2.add(arrowBackButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 70, -1));
 
         mainBackgroundRegister.add(mainBackgroundRegister2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, 740, 420));
 
