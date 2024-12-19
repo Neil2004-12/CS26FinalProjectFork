@@ -14,6 +14,7 @@ import java.sql.*;
 import javax.swing.JOptionPane;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.prefs.Preferences;
 
 public class LoginFrame extends javax.swing.JFrame {
     private static int userID;
@@ -44,8 +45,9 @@ public class LoginFrame extends javax.swing.JFrame {
         checkBoxRememberMe = new javax.swing.JCheckBox();
         signInButton = new javax.swing.JButton();
         signInWithGoogleButton = new javax.swing.JButton();
-        dontHaveAnAccountYetTextLabel = new javax.swing.JLabel();
+        clickHereLabel = new javax.swing.JLabel();
         logoPictureLabel = new javax.swing.JLabel();
+        dontHaveAnAccountYetTextLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -118,12 +120,22 @@ public class LoginFrame extends javax.swing.JFrame {
         });
         mainBackgroundPanel2.add(signInWithGoogleButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 350, 270, 30));
 
-        dontHaveAnAccountYetTextLabel.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
-        dontHaveAnAccountYetTextLabel.setText("Don't have an account yet?");
-        mainBackgroundPanel2.add(dontHaveAnAccountYetTextLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 150, -1));
+        clickHereLabel.setFont(new java.awt.Font("Segoe UI", 1, 10)); // NOI18N
+        clickHereLabel.setForeground(new java.awt.Color(0, 153, 204));
+        clickHereLabel.setText("click here");
+        clickHereLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                clickHereLabelMouseClicked(evt);
+            }
+        });
+        mainBackgroundPanel2.add(clickHereLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 390, 50, -1));
 
         logoPictureLabel.setMaximumSize(new java.awt.Dimension(40, 40));
         mainBackgroundPanel2.add(logoPictureLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 70, 300, 290));
+
+        dontHaveAnAccountYetTextLabel1.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        dontHaveAnAccountYetTextLabel1.setText("Don't have an account yet?");
+        mainBackgroundPanel2.add(dontHaveAnAccountYetTextLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, -1, -1));
 
         mainBackgroundPanel.add(mainBackgroundPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(35, 32, 740, 420));
 
@@ -141,12 +153,46 @@ public class LoginFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_passwordFieldActionPerformed
 
     private void signInWithGoogleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signInWithGoogleButtonActionPerformed
-        new RegistrationForm().setVisible(true);
+        // TODO add your handling code here:
         
     }//GEN-LAST:event_signInWithGoogleButtonActionPerformed
 
     private void checkBoxRememberMeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxRememberMeActionPerformed
         // TODO add your handling code here:
+        // Preferences for storing user credentials
+    Preferences preferences = Preferences.userNodeForPackage(getClass());
+
+    // Check if the checkbox is selected
+    if (checkBoxRememberMe.isSelected()) {
+        // Save email and password
+        String email = emailTextField.getText();
+        String password = new String(passwordField.getPassword());
+        
+        // Save credentials in preferences
+        preferences.put("email", email);
+        preferences.put("password", password);
+
+        // Notify user (optional)
+        System.out.println("Credentials saved!");
+    } else {
+        // Clear saved credentials
+        preferences.remove("email");
+        preferences.remove("password");
+
+        // Notify user (optional)
+        System.out.println("Credentials cleared!");
+    }
+
+    // Load credentials and set the fields and checkbox state
+    String email = preferences.get("email", "");
+    String password = preferences.get("password", "");
+
+    // Pre-fill the email and password fields
+    emailTextField.setText(email);
+    passwordField.setText(password);
+
+    // Update checkbox state
+    checkBoxRememberMe.setSelected(!email.isEmpty() && !password.isEmpty());
     }//GEN-LAST:event_checkBoxRememberMeActionPerformed
 
     private void signInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signInButtonActionPerformed
@@ -162,6 +208,12 @@ public class LoginFrame extends javax.swing.JFrame {
             checkUserData(email, passwordStr);
         }
     }//GEN-LAST:event_signInButtonActionPerformed
+
+    private void clickHereLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_clickHereLabelMouseClicked
+        // TODO add your handling code here:
+        new RegistrationForm().setVisible(true);
+    }//GEN-LAST:event_clickHereLabelMouseClicked
+
     private void checkUserData(String email, String passwordStr) {
         Connection conn = DatabaseConnector.getConnection();
 
@@ -299,7 +351,8 @@ public class LoginFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox checkBoxRememberMe;
-    private javax.swing.JLabel dontHaveAnAccountYetTextLabel;
+    private javax.swing.JLabel clickHereLabel;
+    private javax.swing.JLabel dontHaveAnAccountYetTextLabel1;
     private javax.swing.JTextField emailTextField;
     private javax.swing.JLabel emailTextLabel;
     private javax.swing.JLabel logoPictureLabel;
