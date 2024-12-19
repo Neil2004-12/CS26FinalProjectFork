@@ -3,6 +3,8 @@ package com.mycompany.cs26finalproject;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class MainDashboard {
     private GridBagConstraints gbc = new GridBagConstraints();
@@ -74,11 +76,17 @@ public class MainDashboard {
 
         addProjectButton.addActionListener(e -> {
             String projectName = JOptionPane.showInputDialog(dashboard, "Enter project name:");
+            
             if (projectName != null && !projectName.trim().isEmpty()) {
-                addProjectToDatabase(projectName);
-                addProjectToUI(projectName);
+                if (isProjectNameUnique(projectName, currentUserID)) {
+                    addProjectToDatabase(projectName);
+                    addProjectToUI(projectName);
+                } else {
+                    JOptionPane.showMessageDialog(dashboard, "Project name must be unique. Please choose a different name.");
+                }
             }
         });
+
 
         dashboard.setVisible(true);
     }
@@ -125,6 +133,7 @@ public class MainDashboard {
     }
 
     private void setActiveProject(String projectName) {
+        System.out.println("test123");
         mainContent.removeAll();
         mainContent.setLayout(new BorderLayout());
 
@@ -229,10 +238,43 @@ public class MainDashboard {
         
         JButton addTaskButton = new JButton("Add Task");
         addTaskButton.addActionListener(e -> {
-            String taskName = JOptionPane.showInputDialog(kanbanContent, "Enter task name:");
-            if (taskName != null && !taskName.trim().isEmpty()) {
-                addTaskToDatabase(columnName, taskName);
-                addTaskToColumn(taskPanel, taskName);
+            // Display a dialog to input task details (name, description, due date, and priority)
+            JPanel taskInputPanel = new JPanel(new GridLayout(4, 2, 10, 10));
+            
+            taskInputPanel.add(new JLabel("Task Name:"));
+            JTextField taskNameField = new JTextField();
+            taskInputPanel.add(taskNameField);
+            
+            taskInputPanel.add(new JLabel("Description:"));
+            JTextArea descriptionArea = new JTextArea(3, 20);
+            JScrollPane descriptionScrollPane = new JScrollPane(descriptionArea);
+            taskInputPanel.add(descriptionScrollPane);
+            
+            taskInputPanel.add(new JLabel("Due Date (YYYY-MM-DD):"));
+            JTextField dueDateField = new JTextField();
+            taskInputPanel.add(dueDateField);
+            
+            taskInputPanel.add(new JLabel("Priority:"));
+            JComboBox<String> priorityComboBox = new JComboBox<>(new String[]{"Low", "Medium", "High"});
+            taskInputPanel.add(priorityComboBox);
+            
+            // Show input dialog with task details form
+            int option = JOptionPane.showConfirmDialog(kanbanContent, taskInputPanel, "Enter Task Details", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            
+            if (option == JOptionPane.OK_OPTION) {
+                String taskName = taskNameField.getText().trim();
+                String description = descriptionArea.getText().trim();
+                String dueDate = dueDateField.getText().trim();
+                String priority = (String) priorityComboBox.getSelectedItem();
+                
+                // Validate input before proceeding
+                if (!taskName.isEmpty() && !description.isEmpty() && !dueDate.isEmpty()) {
+                    // Add task to database
+                    addTaskToDatabase(listID, taskName, description, dueDate, priority);
+                    addTaskToColumn(taskPanel, taskName);  
+                } else {
+                    JOptionPane.showMessageDialog(kanbanContent, "All fields are required.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
         columnPanel.add(addTaskButton, BorderLayout.SOUTH);
@@ -285,13 +327,265 @@ public class MainDashboard {
         taskCard.setMaximumSize(new Dimension(200, 50));
         taskCard.setPreferredSize(new Dimension(200, 50));
         taskCard.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        
+        taskCard.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Assuming taskID and other details are stored with the task card
+                // You would fetch the task details from the database or maintain them in a map
+                // For simplicity, let's assume you can get them from the database based on taskName
+                int taskID = getTaskIDFromName(taskName); // You should implement this method to fetch taskID
+                String description = getTaskDescriptionFromDatabase(taskID); // Fetch description
+                String dueDate = getTaskDueDateFromDatabase(taskID); // Fetch due date
+                String priority = getTaskPriorityFromDatabase(taskID); // Fetch priority
+                
+                // Call the showTaskDetails method to display the task details dialog
+                showTaskDetails(taskID, taskName, description, dueDate, priority);
+            }
+        });
 
         taskPanel.add(taskCard);
         taskPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-
+        
         taskPanel.revalidate();
         taskPanel.repaint();
     }
+    private void showTaskDetails(int taskID, String taskName, String description, String dueDate, String priority) {
+        JDialog taskDialog = new JDialog((Frame) null, "Task Details", true);
+        taskDialog.setLayout(new GridLayout(5, 2, 10, 10));
+
+        taskDialog.add(new JLabel("Task Name:"));
+        JTextField nameField = new JTextField(taskName);
+        taskDialog.add(nameField);
+
+        taskDialog.add(new JLabel("Description:"));
+        JTextArea descriptionField = new JTextArea(description, 3, 20);
+        taskDialog.add(new JScrollPane(descriptionField));
+
+        taskDialog.add(new JLabel("Due Date:"));
+        JTextField dueDateField = new JTextField(dueDate);
+        taskDialog.add(dueDateField);
+
+        taskDialog.add(new JLabel("Priority:"));
+        JComboBox<String> priorityBox = new JComboBox<>(new String[]{"Low", "Medium", "High"});
+        priorityBox.setSelectedItem(priority);
+        taskDialog.add(priorityBox);
+
+        JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(e -> {
+            // Save the updated task information to the database
+            updateTaskInDatabase(taskID, nameField.getText(), descriptionField.getText(),
+                    dueDateField.getText(), (String) priorityBox.getSelectedItem());
+            
+            String projectName = getProjectNameByTaskID(taskID);
+            setActiveProject(projectName);
+            // Close the task detail dialog
+            taskDialog.dispose();
+        });
+        taskDialog.add(saveButton);
+
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.addActionListener(e -> {
+            // Delete the task from the database
+            deleteTaskFromDatabase(taskID);
+            
+            // Close the task detail dialog
+            taskDialog.dispose();
+        });
+        taskDialog.add(deleteButton);
+
+        taskDialog.setSize(400, 300);
+        taskDialog.setVisible(true);
+    }
+    
+    private void updateTaskInDatabase(int taskID, String taskName, String description, String dueDate, String priority) {
+        // SQL query to update the task in the database
+        String updateQuery = "UPDATE tasks SET taskName = ?, description = ?, due_date = ?, priority = ? WHERE id = ?";
+        
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
+            
+            // Set the parameters for the query
+            stmt.setString(1, taskName);
+            stmt.setString(2, description);
+            stmt.setString(3, dueDate);
+            stmt.setString(4, priority);
+            stmt.setInt(5, taskID);
+            
+            // Execute the update
+            int rowsAffected = stmt.executeUpdate();
+            
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(null, "Task updated successfully");
+                System.out.println("test");                      
+                String projectName = getProjectNameByTaskID(taskID);
+                setActiveProject(projectName);
+            } else {
+                JOptionPane.showMessageDialog(null, "Failed to update task. Please try again.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error updating task in the database.");
+        }
+    }
+
+    private void deleteTaskFromDatabase(int taskID) {
+        int confirmation = JOptionPane.showConfirmDialog(
+                null,
+                "Are you sure you want to delete this task?",
+                "Delete Task",
+                JOptionPane.YES_NO_OPTION
+        );
+        
+        if (confirmation == JOptionPane.YES_OPTION) {
+            try (Connection connection = DatabaseConnector.getConnection();
+                    PreparedStatement stmt = connection.prepareStatement("DELETE FROM tasks WHERE id = ?")) {
+                
+                stmt.setInt(1, taskID);
+                stmt.executeUpdate();
+                String projectName = getProjectNameByTaskID(taskID);
+                setActiveProject(projectName);
+                JOptionPane.showMessageDialog(null, "Task deleted successfully.");
+            } catch (SQLException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Failed to delete task from database.");
+            }
+        }
+    }
+
+    private int getTaskIDFromName(String taskName) {
+        int taskID = -1; // Default value if task not found
+        String query = "SELECT id FROM tasks WHERE taskName = ?";
+        
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement(query)) {
+            
+            stmt.setString(1, taskName); // Set the task name parameter
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                taskID = rs.getInt("id"); // Get the task ID from the result set
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to retrieve task ID.");
+        }
+        
+        return taskID;
+    }
+    
+    private String getTaskDescriptionFromDatabase(int taskID) {
+        String description = null;
+        String query = "SELECT description FROM tasks WHERE id = ?";
+        
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement(query)) {
+            
+            stmt.setInt(1, taskID); // Set the task ID parameter
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                description = rs.getString("description"); // Get the description from the result set
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to retrieve task description.");
+        }
+        
+        return description;
+    }
+    
+    private String getTaskDueDateFromDatabase(int taskID) {
+        String dueDate = null;
+        String query = "SELECT due_date FROM tasks WHERE id = ?";
+        
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement(query)) {
+            
+            stmt.setInt(1, taskID); // Set the task ID parameter
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                dueDate = rs.getString("due_date"); // Get the due date from the result set
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to retrieve task due date.");
+        }
+        
+        return dueDate;
+    }
+    
+    private String getTaskPriorityFromDatabase(int taskID) {
+        String priority = null;
+        String query = "SELECT priority FROM tasks WHERE id = ?";
+        
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement(query)) {
+            
+            stmt.setInt(1, taskID); // Set the task ID parameter
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                priority = rs.getString("priority"); // Get the priority from the result set
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to retrieve task priority.");
+        }
+        
+        return priority;
+    }
+    private boolean isProjectNameUnique(String projectName, int userID) {
+        boolean isUnique = false;
+        
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement(
+                        "SELECT COUNT(*) FROM projects WHERE projectName = ? AND userID = ?")) {
+            
+            stmt.setString(1, projectName);
+            stmt.setInt(2, userID);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    isUnique = rs.getInt(1) == 0; // True if no matching project name is found
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to check project name uniqueness.");
+        }
+        
+        return isUnique;
+    }
+    
+    private String getProjectNameByTaskID(int taskID) {
+        String projectName = null;
+        
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement(
+                        "SELECT p.projectName " +
+                                "FROM projects p " +
+                                "JOIN lists l ON l.projectID = p.id " +
+                                "JOIN tasks t ON t.listID = l.id " +
+                                "WHERE t.id = ?")) {
+            
+            stmt.setInt(1, taskID);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    projectName = rs.getString("projectName");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to fetch project name for the given task ID.");
+        }
+        
+        return projectName;
+    }
+
 
     public static void main(String[] args) {
         // Assuming the userID is passed as a command-line argument
