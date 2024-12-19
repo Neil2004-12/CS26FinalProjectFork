@@ -259,13 +259,16 @@ public class MainDashboard {
         }
     }
     
-    private void addTaskToDatabase(String listName, String taskName) {
+    private void addTaskToDatabase(int listID, String taskName, String description, String dueDate, String priority) {
         try (Connection connection = DatabaseConnector.getConnection();
-             PreparedStatement stmt = connection.prepareStatement("INSERT INTO tasks (taskName, listID) VALUES (?, (SELECT id FROM lists WHERE listName = ? AND projectID IN (SELECT id FROM projects WHERE userID = ?)))")) {
+            PreparedStatement stmt = connection.prepareStatement(
+                 "INSERT INTO tasks (taskName, listID, description, due_date, priority) VALUES (?, ?, ?, ?, ?)")) {
 
             stmt.setString(1, taskName);
-            stmt.setString(2, listName);
-            stmt.setInt(3, currentUserID);
+            stmt.setInt(2, listID);
+            stmt.setString(3, description);
+            stmt.setString(4, dueDate);
+            stmt.setString(5, priority);
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
