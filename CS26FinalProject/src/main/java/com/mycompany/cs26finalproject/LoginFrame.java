@@ -17,6 +17,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.prefs.Preferences;
 
 public class LoginFrame extends javax.swing.JFrame {
+    private static int userID;
 //set comment
     /**
      * Creates new form LoginFrame
@@ -214,35 +215,40 @@ public class LoginFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_clickHereLabelMouseClicked
 
     private void checkUserData(String email, String passwordStr) {
-        // Assuming you have a Connector class for database connection
         Connection conn = DatabaseConnector.getConnection();
-    
+
         if (conn == null) {
             JOptionPane.showMessageDialog(this, "Database connection failed.");
             return;
         }
 
         try {
-            // Prepare a SQL query to get the stored password hash for the user
-            String query = "SELECT password FROM users WHERE email = ?";
+            // Prepare a SQL query to get the stored password hash and user ID for the user
+            String query = "SELECT id, password FROM users WHERE email = ?";
             PreparedStatement ps = conn.prepareStatement(query);
-            ps.setString(1, email);  // Set the email in the query
-        
+            ps.setString(1, email);
+
             // Execute the query
             ResultSet rs = ps.executeQuery();
-        
+
             if (rs.next()) {
-                // User exists, get the stored hashed password
+                // User exists, get the stored hashed password and user ID
                 String storedPasswordHash = rs.getString("password");
-            
+                int userID = rs.getInt("id");
+
                 // Hash the entered password using SHA-256
                 String hashedPassword = hashPassword(passwordStr);
-            
+
                 // Check if the provided password hash matches the stored hash
                 if (hashedPassword.equals(storedPasswordHash)) {
                     // Password matches, login successful
                     JOptionPane.showMessageDialog(this, "Login successful!");
-                    MainDashboard dashboard = new MainDashboard();
+                
+                    // Pass the user ID to MainDashboard
+                    MainDashboard.main(new String[]{String.valueOf(userID)});
+
+                    // Dispose of the login frame
+                    this.dispose();
                 } else {
                     // Password doesn't match
                     JOptionPane.showMessageDialog(this, "Invalid password. Please try again.");
@@ -251,12 +257,9 @@ public class LoginFrame extends javax.swing.JFrame {
                 // No user found with the provided email
                 JOptionPane.showMessageDialog(this, "No user found with this email.");
             }
-        
         } catch (SQLException e) {
-            // Handle any database-related exceptions
             JOptionPane.showMessageDialog(this, "Error checking user data: " + e.getMessage());
         } finally {
-            // Always close the connection
             try {
                 if (conn != null && !conn.isClosed()) {
                     conn.close();
@@ -266,6 +269,12 @@ public class LoginFrame extends javax.swing.JFrame {
             }
         }
     }
+    
+    
+    public interface LoginSuccessListener {
+        void onLoginSuccess(int userID);
+    }
+    
 
     // Method to hash the password using SHA-256
     private String hashPassword(String password) {
