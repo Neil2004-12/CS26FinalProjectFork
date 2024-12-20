@@ -5,6 +5,10 @@ import java.awt.*;
 import java.sql.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
 
 public class MainDashboard {
     private GridBagConstraints gbc = new GridBagConstraints();
@@ -61,6 +65,20 @@ public class MainDashboard {
             }
         });
         topNavBar.add(logoutButton);
+        
+        // Create the date/time label
+        JLabel dateTimeLabel = new JLabel();
+        dateTimeLabel.setForeground(Color.WHITE); // White text for contrast
+        dateTimeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        topNavBar.add(dateTimeLabel);
+
+        // Update the date/time label every second
+        Timer timer = new Timer(1000, e -> {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
+            String currentTime = dateFormat.format(new Date());
+            dateTimeLabel.setText(currentTime);
+        });
+        timer.start();
         
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -285,7 +303,7 @@ public class MainDashboard {
         JButton projectButton = new JButton(projectName);
         projectButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         projectButton.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        projectButton.setForeground(Color.WHITE); // White text for contrast
+        projectButton.setForeground(Color.BLACK); // gray text for contrast
         projectButton.setBackground(new Color(249, 239, 196)); // Beige background
         
         // Remove borders and focus
@@ -566,9 +584,9 @@ public class MainDashboard {
                 String description = getTaskDescriptionFromDatabase(taskID); // Fetch description
                 String dueDate = getTaskDueDateFromDatabase(taskID); // Fetch due date
                 String priority = getTaskPriorityFromDatabase(taskID); // Fetch priority
-                
+                int projectID = getProjectIDFromTask(taskID);
                 // Call the showTaskDetails method to display the task details dialog
-                showTaskDetails(taskID, taskName, description, dueDate, priority);
+                showTaskDetails(taskID, taskName, description, dueDate, priority, projectID);
             }
         });
 
@@ -578,33 +596,61 @@ public class MainDashboard {
         taskPanel.revalidate();
         taskPanel.repaint();
     }
-    
-    private void showTaskDetails(int taskID, String taskName, String description, String dueDate, String priority) {
-        JDialog taskDialog = new JDialog((Frame) null, "Task Details", true);
-        taskDialog.setLayout(new GridLayout(5, 2, 10, 10));
+    private int getProjectIDFromTask(int taskID) {
+        int projectID = -1; // Default value if no project is found
+        try (Connection connection = DatabaseConnector.getConnection()) {
+            String query = "SELECT l.projectID FROM tasks t " +
+                       "JOIN lists l ON t.listID = l.id " +
+                       "WHERE t.id = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setInt(1, taskID);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    projectID = rs.getInt("projectID");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return projectID;
+}
 
+    private void showTaskDetails(int taskID, String taskName, String description, String dueDate, String priority, int currentProjectID) {
+        JDialog taskDialog = new JDialog((Frame) null, "Task Details", true);
+        taskDialog.setLayout(new GridLayout(6, 2, 10, 10)); // Increase row count to accommodate new field
+        
         taskDialog.add(new JLabel("Task Name:"));
         JTextField nameField = new JTextField(taskName);
         taskDialog.add(nameField);
-
+        
         taskDialog.add(new JLabel("Description:"));
         JTextArea descriptionField = new JTextArea(description, 3, 20);
         taskDialog.add(new JScrollPane(descriptionField));
-
+        
         taskDialog.add(new JLabel("Due Date:"));
         JTextField dueDateField = new JTextField(dueDate);
         taskDialog.add(dueDateField);
-
+        
         taskDialog.add(new JLabel("Priority:"));
         JComboBox<String> priorityBox = new JComboBox<>(new String[]{"Low", "Medium", "High"});
         priorityBox.setSelectedItem(priority);
         taskDialog.add(priorityBox);
-
+        
+        // Add JComboBox to select a new list
+        taskDialog.add(new JLabel("Transfer to List:"));
+        JComboBox<String> listBox = new JComboBox<>();
+        // Get available lists for the current project
+        List<String> lists = getProjectLists(currentProjectID); // Method to fetch lists for the project
+        for (String listName : lists) {
+            listBox.addItem(listName);
+        }
+        taskDialog.add(listBox);
+        
         JButton saveButton = new JButton("Save");
         saveButton.addActionListener(e -> {
             // Save the updated task information to the database
             updateTaskInDatabase(taskID, nameField.getText(), descriptionField.getText(),
-                    dueDateField.getText(), (String) priorityBox.getSelectedItem());
+                    dueDateField.getText(), (String) priorityBox.getSelectedItem(), (String) listBox.getSelectedItem());
             
             String projectName = getProjectNameByTaskID(taskID);
             setActiveProject(projectName);
@@ -612,21 +658,68 @@ public class MainDashboard {
             taskDialog.dispose();
         });
         taskDialog.add(saveButton);
-
+        
         JButton deleteButton = new JButton("Delete");
         deleteButton.addActionListener(e -> {
             // Delete the task from the database
             deleteTaskFromDatabase(taskID);
-            
             // Close the task detail dialog
             taskDialog.dispose();
         });
         taskDialog.add(deleteButton);
-
+        
         taskDialog.setSize(400, 300);
         taskDialog.setVisible(true);
     }
-    
+
+    private List<String> getProjectLists(int projectID) {
+        List<String> lists = new ArrayList<>();
+        try (Connection connection = DatabaseConnector.getConnection()) {
+            String query = "SELECT listName FROM lists WHERE projectID = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setInt(1, projectID);
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    lists.add(rs.getString("listName"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lists;
+    }
+
+    private void updateTaskInDatabase(int taskID, String taskName, String description, String dueDate, String priority, String listName) {
+    try (Connection connection = DatabaseConnector.getConnection()) {
+        // Get listID from listName
+        String listQuery = "SELECT id FROM lists WHERE listName = ?";
+        int listID = -1;
+        try (PreparedStatement stmt = connection.prepareStatement(listQuery)) {
+            stmt.setString(1, listName);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                listID = rs.getInt("id");
+            }
+        }
+
+        if (listID != -1) {
+            // Update the task with the new listID
+            String updateQuery = "UPDATE tasks SET taskName = ?, description = ?, due_date = ?, priority = ?, listID = ? WHERE id = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
+                stmt.setString(1, taskName);
+                stmt.setString(2, description);
+                stmt.setString(3, dueDate);
+                stmt.setString(4, priority);
+                stmt.setInt(5, listID);
+                stmt.setInt(6, taskID);
+                stmt.executeUpdate();
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+
     private void showListDetails(String listName, int listID) {
         JDialog taskDialog = new JDialog((Frame) null, "List Details", true);
         taskDialog.setLayout(new GridLayout(5, 2, 10, 10));
