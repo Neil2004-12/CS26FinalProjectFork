@@ -202,6 +202,8 @@ public class RegistrationForm extends javax.swing.JFrame {
 
         // If all validations pass, insert user data
         insertUserData(firstName, lastName, email, userName, passwordStr);
+        this.dispose();
+        new LoginFrame().setVisible(true);
 
     }//GEN-LAST:event_signInRegisterButtonActionPerformed
     private boolean isEmpty(String... fields) {
@@ -290,7 +292,7 @@ public class RegistrationForm extends javax.swing.JFrame {
                 
                 // Check if the insert was successful
                 if (rowsAffected > 0) {
-                    JOptionPane.showMessageDialog(this, "Data inserted successfully!");
+                    JOptionPane.showMessageDialog(this, "Registered successfully! You may now log in!");
                 } else {
                     JOptionPane.showMessageDialog(this, "Error inserting data.");
                 }

@@ -300,7 +300,6 @@ public class MainDashboard {
     }
     
     private void addKanbanColumn(JPanel kanbanContent, String columnName, int listID) {
-        System.out.println("test");
         GridBagConstraints columnGbc = new GridBagConstraints();
         columnGbc.fill = GridBagConstraints.BOTH;
         columnGbc.gridy = 0;
@@ -884,21 +883,27 @@ public class MainDashboard {
         
         JButton saveButton = new JButton("Save");
         saveButton.addActionListener(e -> {
-            // Save the updated task information to the database
-            updateListInDatabase(listID, nameField.getText());
-            reloadUI();
-            
-            // Close the task detail dialog
-            taskDialog.dispose();
+            String newListName = nameField.getText().trim();
+            if (isListNameUnique(newListName, listID)) {
+                // Save the updated list information to the database
+                updateListInDatabase(listID, newListName);
+                reloadUI();
+                
+                // Close the list detail dialog
+                taskDialog.dispose();
+            } else {
+                // Show a message if the list name is not unique
+                JOptionPane.showMessageDialog(taskDialog, "The list name must be unique within the project.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
         taskDialog.add(saveButton);
         
         JButton deleteButton = new JButton("Delete");
         deleteButton.addActionListener(e -> {
-            // Delete the task from the database
+            // Delete the list from the database
             deleteListFromDatabase(listID);
             reloadUI();
-            // Close the task detail dialog
+            // Close the list detail dialog
             taskDialog.dispose();
         });
         taskDialog.add(deleteButton);
@@ -930,6 +935,44 @@ public class MainDashboard {
         return isUnique;
     }
     
+    private boolean isListNameUnique(String listName, int listID) {
+        boolean isUnique = true;
+        try (Connection connection = DatabaseConnector.getConnection()) {
+            String query = "SELECT COUNT(*) FROM lists WHERE listName = ? AND projectID = (SELECT projectID FROM lists WHERE id = ?)";
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setString(1, listName);
+                stmt.setInt(2, listID);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    // If the count is greater than 0, it means a list with the same name exists in the project
+                    isUnique = rs.getInt(1) == 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return isUnique;
+    }
+    
+    private boolean isListNameUniqueForProject(String listName, String projectName) {
+        boolean isUnique = true;
+        try (Connection connection = DatabaseConnector.getConnection()) {
+            String query = "SELECT COUNT(*) FROM lists WHERE listName = ? AND projectID = (SELECT id FROM projects WHERE projectName = ?)";
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setString(1, listName);
+                stmt.setString(2, projectName);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    // If the count is greater than 0, it means a list with the same name exists in the project
+                    isUnique = rs.getInt(1) == 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return isUnique;
+    }
+    
     private void reloadUI() {
         projectListPanel.removeAll();
         mainContent.removeAll();
@@ -954,10 +997,16 @@ public class MainDashboard {
         addListButton.addActionListener(e -> {
             String listName = JOptionPane.showInputDialog(mainContent, "Enter list name:");
             if (listName != null && !listName.trim().isEmpty()) {
-                // Add list to database
-                int listID = addListToDatabase(projectName, listName);
-                // Add the Kanban column (task list) to the UI
-                addKanbanColumn(kanbanBoard, listName, listID);
+                // Check if the list name is unique for the current project
+                if (isListNameUniqueForProject(listName, projectName)) {
+                    // Add list to database
+                    int listID = addListToDatabase(projectName, listName);
+                    // Add the Kanban column (task list) to the UI
+                    addKanbanColumn(kanbanBoard, listName, listID);
+                } else {
+                    // Show a message if the list name is not unique
+                    JOptionPane.showMessageDialog(mainContent, "The list name must be unique within the project.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
         mainContent.add(addListButton, BorderLayout.SOUTH);
@@ -965,6 +1014,9 @@ public class MainDashboard {
         mainContent.revalidate();
         mainContent.repaint();
     }
+
+    
+
     
     public static void main(String[] args) {
         // Assuming the userID is passed as a command-line argument
