@@ -175,27 +175,43 @@ public class RegistrationForm extends javax.swing.JFrame {
         char[] confirmPassword = confirmPasswordTextField.getPassword();
         String confirmPasswordStr = new String(confirmPassword);  
         
-        if (duplicateChecker(email, userName)) {
-            JOptionPane.showMessageDialog(this, "Account already exists. Please enter a different username/email.");
-        } else {
-            // Check if any required fields are empty
-            if (firstName.trim().isEmpty() || lastName.trim().isEmpty() || email.trim().isEmpty() || userName.trim().isEmpty() || passwordStr.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Fill up all fields");
-            } else if (passwordStr == null || confirmPasswordStr == null || passwordStr.trim().isEmpty() || confirmPasswordStr.trim().isEmpty()) {
-            // Check if passwords are entered
-                JOptionPane.showMessageDialog(this, "Please enter both passwords.");
-            } else if (!passwordStr.trim().equals(confirmPasswordStr.trim())) {
-            // Check if passwords match
-                JOptionPane.showMessageDialog(this, "Passwords do not match");
-            } else {
-            // If all validations pass, insert user data
-                insertUserData(firstName, lastName, email, userName, passwordStr);
-            }  
+        
+        
+        // Check for empty fields
+        if (isEmpty(firstName, lastName, email, userName, passwordStr, confirmPasswordStr)) {
+            JOptionPane.showMessageDialog(this, "Please fill up all fields.");
+            return;
         }
         
-          
+        if (duplicateChecker(email, userName)) {
+            JOptionPane.showMessageDialog(this, "Account already exists. Please enter a different username/email.");
+            return;
+        }
+
+        // Check if passwords are entered
+        if (passwordStr == null || confirmPasswordStr == null || passwordStr.trim().isEmpty() || confirmPasswordStr.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter both passwords.");
+            return;
+        }
+
+        // Check if passwords match
+        if (!passwordStr.trim().equals(confirmPasswordStr.trim())) {
+            JOptionPane.showMessageDialog(this, "Passwords do not match.");
+        return;
+        }
+
+        // If all validations pass, insert user data
+        insertUserData(firstName, lastName, email, userName, passwordStr);
+
     }//GEN-LAST:event_signInRegisterButtonActionPerformed
-    
+    private boolean isEmpty(String... fields) {
+        for (String field : fields) {
+            if (field == null || field.trim().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
     private Boolean duplicateChecker (String email, String userName) {
         Connection conn = DatabaseConnector.getConnection();
         Boolean flag1 = false;
@@ -303,6 +319,7 @@ public class RegistrationForm extends javax.swing.JFrame {
     private void arrowBackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_arrowBackButtonActionPerformed
         // TODO add your handling code here:
          new LoginFrame().setVisible(true);
+         this.dispose();
     }//GEN-LAST:event_arrowBackButtonActionPerformed
 
     /**

@@ -212,6 +212,7 @@ public class LoginFrame extends javax.swing.JFrame {
     private void clickHereLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_clickHereLabelMouseClicked
         // TODO add your handling code here:
         new RegistrationForm().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_clickHereLabelMouseClicked
 
     private void checkUserData(String email, String passwordStr) {

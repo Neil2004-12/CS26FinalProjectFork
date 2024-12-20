@@ -18,65 +18,64 @@ public class MainDashboard {
     public MainDashboard(int userID) {
         this.currentUserID = userID;
 
+        // Main Frame
         JFrame dashboard = new JFrame();
         dashboard.setTitle("Kanban Dashboard");
         dashboard.setLayout(new GridBagLayout());
         dashboard.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         dashboard.setSize(1600, 1000);
+        dashboard.getContentPane().setBackground(new Color(0, 102, 153)); // Dark blue background
 
         gbc.fill = GridBagConstraints.BOTH;
 
+        // Top Navigation Bar
         JPanel topNavBar = new JPanel();
-        topNavBar.setBackground(Color.BLUE);
+        topNavBar.setBackground(new Color(0, 102, 153)); // Beige background
+        topNavBar.setPreferredSize(new Dimension(dashboard.getWidth(), 60));
+        topNavBar.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 10));
+
+        JLabel titleLabel = new JLabel("Kanban Dashboard");
+        titleLabel.setForeground(new Color(255, 223, 0)); // Dark blue text
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        topNavBar.add(titleLabel);
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
-        gbc.gridheight = 1;
         gbc.weightx = 1;
         gbc.weighty = 0.1;
         dashboard.add(topNavBar, gbc);
 
+        // Side Navigation Bar
         JPanel sideNavBar = new JPanel();
         sideNavBar.setLayout(new BorderLayout());
-        sideNavBar.setBackground(Color.GREEN);
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.weightx = 0.2;
-        gbc.weighty = 1;
-        dashboard.add(sideNavBar, gbc);
+        sideNavBar.setBackground(new Color(249, 239, 196)); // Beige
+        sideNavBar.setPreferredSize(new Dimension(300, dashboard.getHeight()));
+
+        JLabel sideBarLabel = new JLabel("Projects", SwingConstants.CENTER);
+        sideBarLabel.setForeground(new Color(0, 102, 153)); // Dark blue
+        sideBarLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        sideBarLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        sideNavBar.add(sideBarLabel, BorderLayout.NORTH);
 
         projectListPanel = new JPanel();
         projectListPanel.setLayout(new BoxLayout(projectListPanel, BoxLayout.Y_AXIS));
-        projectListPanel.setBackground(Color.GREEN);
+        projectListPanel.setBackground(new Color(249, 239, 196)); // Match the beige color
 
         JScrollPane projectListScrollPane = new JScrollPane(projectListPanel);
         projectListScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        projectListScrollPane.setBorder(null); // No border for cleaner look
         sideNavBar.add(projectListScrollPane, BorderLayout.CENTER);
 
         JButton addProjectButton = new JButton("Add Project");
-        sideNavBar.add(addProjectButton, BorderLayout.SOUTH);
-
-        projectButtonGroup = new ButtonGroup();
-
-        mainContent = new JPanel();
-        mainContent.setLayout(new BorderLayout());
-        mainContent.setBackground(Color.LIGHT_GRAY);
-
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.weightx = 0.8;
-        gbc.weighty = 1;
-        dashboard.add(mainContent, gbc);
-
-        loadProjectsFromDatabase();
-
+        addProjectButton.setBackground(new Color(0, 102, 153)); // Dark blue
+        addProjectButton.setForeground(Color.WHITE);
+        addProjectButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        addProjectButton.setFocusPainted(false);
+        addProjectButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         addProjectButton.addActionListener(e -> {
             String projectName = JOptionPane.showInputDialog(dashboard, "Enter project name:");
-            
+
             if (projectName != null && !projectName.trim().isEmpty()) {
                 if (isProjectNameUnique(projectName, currentUserID)) {
                     addProjectToDatabase(projectName);
@@ -86,7 +85,30 @@ public class MainDashboard {
                 }
             }
         });
+        sideNavBar.add(addProjectButton, BorderLayout.SOUTH);
 
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.2;
+        gbc.weighty = 1;
+        dashboard.add(sideNavBar, gbc);
+
+        // Main Content Area
+        mainContent = new JPanel();
+        mainContent.setLayout(new BorderLayout());
+        mainContent.setBackground(Color.WHITE);
+        mainContent.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Padding for clean look
+
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.8;
+        gbc.weighty = 1;
+        dashboard.add(mainContent, gbc);
+
+        // Load Projects from Database
+        loadProjectsFromDatabase();
 
         dashboard.setVisible(true);
     }
@@ -121,13 +143,19 @@ public class MainDashboard {
         }
     }
 
-    private void addProjectToUI(String projectName) {
-        JRadioButton projectButton = new JRadioButton(projectName);
-        projectButtonGroup.add(projectButton);
+      private void addProjectToUI(String projectName) {
+        JButton projectButton = new JButton(projectName);
         projectButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        projectButton.setBackground(new Color(204, 204, 204)); // Light gray
+        projectButton.setForeground(new Color(0, 102, 153)); // Dark blue text
+        projectButton.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        projectButton.setFocusPainted(false);
+        projectButton.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200), 1));
+        projectButton.setPreferredSize(new Dimension(250, 40));
         projectButton.addActionListener(e -> setActiveProject(projectName));
-        projectListPanel.add(projectButton);
 
+        projectListPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Spacing between buttons
+        projectListPanel.add(projectButton);
         projectListPanel.revalidate();
         projectListPanel.repaint();
     }
