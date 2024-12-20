@@ -14,59 +14,111 @@ public class MainDashboard {
     private JPanel mainContent; // Kanban board area
     private int userID;
     private int currentUserID; // The logged-in user's ID
-
+    private String currentUserName;
+    
     public MainDashboard(int userID) {
         this.currentUserID = userID;
-
+        currentUserName = getUserNameById(currentUserID);
         // Main Frame
         JFrame dashboard = new JFrame();
-        dashboard.setTitle("Kanban Dashboard");
+        dashboard.setTitle("Flowzone");
         dashboard.setLayout(new GridBagLayout());
         dashboard.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         dashboard.setSize(1600, 1000);
         dashboard.getContentPane().setBackground(new Color(0, 102, 153)); // Dark blue background
-
+        
         gbc.fill = GridBagConstraints.BOTH;
-
+        
         // Top Navigation Bar
         JPanel topNavBar = new JPanel();
-        topNavBar.setBackground(new Color(0, 102, 153)); // Beige background
+        topNavBar.setBackground(new Color(0, 102, 153)); // Dark blue background
         topNavBar.setPreferredSize(new Dimension(dashboard.getWidth(), 60));
         topNavBar.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 10));
-
-        JLabel titleLabel = new JLabel("Kanban Dashboard");
-        titleLabel.setForeground(new Color(255, 223, 0)); // Dark blue text
+        
+        JLabel titleLabel = new JLabel("Flowzone");
+        titleLabel.setForeground(new Color(255, 223, 0)); // Yellow text for contrast
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
         topNavBar.add(titleLabel);
+        
+         // Add Welcome Label
+        JLabel welcomeLabel = new JLabel("Welcome, " + currentUserName);
+        welcomeLabel.setForeground(Color.WHITE);
+        welcomeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        topNavBar.add(welcomeLabel);
 
+        // Add Logout Button
+        JButton logoutButton = new JButton("Logout");
+        logoutButton.setBackground(new Color(255, 77, 77)); // Red for logout
+        logoutButton.setForeground(Color.WHITE);
+        logoutButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        logoutButton.setFocusPainted(false);
+        logoutButton.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(dashboard, "Are you sure you want to log out?", 
+                    "Logout", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                new LoginFrame().setVisible(true);
+                dashboard.dispose(); // Close the current dashboard window
+            }
+        });
+        topNavBar.add(logoutButton);
+        
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         gbc.weightx = 1;
         gbc.weighty = 0.1;
         dashboard.add(topNavBar, gbc);
-
+        
         // Side Navigation Bar
         JPanel sideNavBar = new JPanel();
         sideNavBar.setLayout(new BorderLayout());
-        sideNavBar.setBackground(new Color(249, 239, 196)); // Beige
-        sideNavBar.setPreferredSize(new Dimension(300, dashboard.getHeight()));
-
+        sideNavBar.setBackground(new Color(249, 239, 196)); // Beige background
+        
         JLabel sideBarLabel = new JLabel("Projects", SwingConstants.CENTER);
-        sideBarLabel.setForeground(new Color(0, 102, 153)); // Dark blue
+        sideBarLabel.setForeground(new Color(0, 102, 153)); // Dark blue text
         sideBarLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
         sideBarLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
         sideNavBar.add(sideBarLabel, BorderLayout.NORTH);
-
+        
         projectListPanel = new JPanel();
         projectListPanel.setLayout(new BoxLayout(projectListPanel, BoxLayout.Y_AXIS));
         projectListPanel.setBackground(new Color(249, 239, 196)); // Match the beige color
-
+        
         JScrollPane projectListScrollPane = new JScrollPane(projectListPanel);
         projectListScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        projectListScrollPane.setBorder(null); // No border for cleaner look
+        projectListScrollPane.setBorder(null);
         sideNavBar.add(projectListScrollPane, BorderLayout.CENTER);
-
+        
+        
+        
+        // Add Edit and Delete Buttons
+        JPanel projectActionPanel = new JPanel();
+        projectActionPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        projectActionPanel.setBackground(new Color(249, 239, 196)); // Match the side bar color
+        
+        JButton editProjectButton = new JButton("Edit Project");
+        editProjectButton.setBackground(new Color(0, 102, 153)); // Dark blue
+        editProjectButton.setForeground(Color.WHITE);
+        editProjectButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        editProjectButton.setFocusPainted(false);
+        editProjectButton.addActionListener(e -> {
+            String selectedProjectName = getSelectedProjectName();
+            if (selectedProjectName != null) {
+                String newProjectName = JOptionPane.showInputDialog(dashboard, "Enter new project name:", selectedProjectName);
+                if (newProjectName != null && !newProjectName.trim().isEmpty()) {
+                    if (isProjectNameUnique(newProjectName, currentUserID)) {
+                        updateProjectNameInDatabase(selectedProjectName, newProjectName);
+                        refreshProjectList();
+                    } else {
+                        JOptionPane.showMessageDialog(dashboard, "Project name must be unique. Please choose a different name.");
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(dashboard, "Please select a project to edit.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        projectActionPanel.add(editProjectButton);
+        
         JButton addProjectButton = new JButton("Add Project");
         addProjectButton.setBackground(new Color(0, 102, 153)); // Dark blue
         addProjectButton.setForeground(Color.WHITE);
@@ -85,33 +137,117 @@ public class MainDashboard {
                 }
             }
         });
-        sideNavBar.add(addProjectButton, BorderLayout.SOUTH);
-
+        projectActionPanel.add(addProjectButton);
+        
+        JButton deleteProjectButton = new JButton("Delete Project");
+        deleteProjectButton.setBackground(new Color(204, 0, 0)); // Red for delete
+        deleteProjectButton.setForeground(Color.WHITE);
+        deleteProjectButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        deleteProjectButton.setFocusPainted(false);
+        deleteProjectButton.addActionListener(e -> {
+            String selectedProjectName = getSelectedProjectName();
+            if (selectedProjectName != null) {
+                int confirm = JOptionPane.showConfirmDialog(dashboard, "Are you sure you want to delete this project?",
+                        "Delete Project", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    deleteProjectFromDatabase(selectedProjectName);
+                    refreshProjectList();
+                    reloadUI();
+                }
+            } else {
+                JOptionPane.showMessageDialog(dashboard, "Please select a project to delete.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        projectActionPanel.add(deleteProjectButton);
+        
+        sideNavBar.add(projectActionPanel, BorderLayout.SOUTH);
+        
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.weightx = 0.2;
         gbc.weighty = 1;
         dashboard.add(sideNavBar, gbc);
-
+        
         // Main Content Area
         mainContent = new JPanel();
         mainContent.setLayout(new BorderLayout());
         mainContent.setBackground(Color.WHITE);
-        mainContent.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Padding for clean look
-
+        mainContent.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.weightx = 0.8;
         gbc.weighty = 1;
         dashboard.add(mainContent, gbc);
-
+        
         // Load Projects from Database
         loadProjectsFromDatabase();
-
+        
         dashboard.setVisible(true);
     }
+    
+    private String getSelectedProjectName() {
+        for (Component comp : projectListPanel.getComponents()) {
+            if (comp instanceof JButton) {
+                JButton button = (JButton) comp;
+                if (button.getBackground().equals(new Color(0, 102, 153))) { // Assuming selected buttons are highlighted
+                    return button.getText();
+                }
+            }
+        }
+        return null; // No project selected
+    }
+    public String getUserNameById(int userID) {
+        String username = null;    
+        
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement("SELECT userName FROM users WHERE id = ?")) {
+            
+            stmt.setInt(1, userID); // Set the userID in the query
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                username = rs.getString("userName"); // Retrieve the username
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle SQL exception
+        }
+        
+        return username;
+    }
+    
+    private void updateProjectNameInDatabase(String oldName, String newName) {
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement("UPDATE projects SET projectName = ? WHERE projectName = ?")) {
+            stmt.setString(1, newName);
+            stmt.setString(2, oldName);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to update project name in the database.");
+        }
+    }
+    
+    private void deleteProjectFromDatabase(String projectName) {
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement("DELETE FROM projects WHERE projectName = ?")) {
+            stmt.setString(1, projectName);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to delete project from the database.");
+        }
+    }
+
+    private void refreshProjectList() {
+        projectListPanel.removeAll();
+        loadProjectsFromDatabase();
+        projectListPanel.revalidate();
+        projectListPanel.repaint();
+    }
+
 
     private void loadProjectsFromDatabase() {
         try (Connection connection = DatabaseConnector.getConnection();
@@ -143,22 +279,64 @@ public class MainDashboard {
         }
     }
 
-      private void addProjectToUI(String projectName) {
+    private JButton selectedButton = null; // Track the selected button
+
+    private void addProjectToUI(String projectName) {
         JButton projectButton = new JButton(projectName);
         projectButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        projectButton.setBackground(new Color(204, 204, 204)); // Light gray
-        projectButton.setForeground(new Color(0, 102, 153)); // Dark blue text
         projectButton.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        projectButton.setForeground(Color.WHITE); // White text for contrast
+        projectButton.setBackground(new Color(249, 239, 196)); // Beige background
+        
+        // Remove borders and focus
+        projectButton.setBorderPainted(false);
         projectButton.setFocusPainted(false);
-        projectButton.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200), 1));
-        projectButton.setPreferredSize(new Dimension(250, 40));
-        projectButton.addActionListener(e -> setActiveProject(projectName));
-
-        projectListPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Spacing between buttons
+        projectButton.setContentAreaFilled(false);
+        
+        // Add hover effect (optional)
+        projectButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                if (projectButton != selectedButton) {
+                    projectButton.setBackground(new Color(230, 230, 230)); // Light gray hover
+                    projectButton.setOpaque(true);
+                }
+            }
+            
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                if (projectButton != selectedButton) {
+                    projectButton.setBackground(new Color(249, 239, 196)); // Restore beige
+                    projectButton.setOpaque(true);
+                }
+            }
+        });
+        
+        projectButton.addActionListener(e -> {
+            // If there is a selected button, reset its background
+            if (selectedButton != null) {
+                selectedButton.setBackground(new Color(249, 239, 196)); // Beige background
+                selectedButton.setOpaque(true);
+            }
+            
+            // Set the new selected button's background to dark blue
+            projectButton.setBackground(new Color(0, 102, 153)); // Dark blue background
+            projectButton.setOpaque(true);
+            
+            // Update the selected button reference
+            selectedButton = projectButton;
+            
+            // Call method to handle the active project change
+            setActiveProject(projectName);
+        });
+        
+        projectListPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Add spacing between buttons
         projectListPanel.add(projectButton);
         projectListPanel.revalidate();
         projectListPanel.repaint();
     }
+
+
 
     private void setActiveProject(String projectName) {
         System.out.println("test123");

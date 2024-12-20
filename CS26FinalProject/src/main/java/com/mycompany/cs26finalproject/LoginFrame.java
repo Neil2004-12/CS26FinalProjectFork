@@ -59,8 +59,8 @@ public class LoginFrame extends javax.swing.JFrame {
         mainBackgroundPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         tastManagerTitle.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        tastManagerTitle.setText("Task Manager");
-        mainBackgroundPanel2.add(tastManagerTitle, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 30, 169, -1));
+        tastManagerTitle.setText("Flowzone");
+        mainBackgroundPanel2.add(tastManagerTitle, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 30, 120, -1));
 
         emailTextLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         emailTextLabel.setText("Email");
@@ -161,7 +161,7 @@ public class LoginFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         // Preferences for storing user credentials
     Preferences preferences = Preferences.userNodeForPackage(getClass());
-
+    
     // Check if the checkbox is selected
     if (checkBoxRememberMe.isSelected()) {
         // Save email and password
