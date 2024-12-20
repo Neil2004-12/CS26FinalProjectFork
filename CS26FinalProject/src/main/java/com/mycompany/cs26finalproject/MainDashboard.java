@@ -157,7 +157,6 @@ public class MainDashboard {
         mainContent.repaint();
     }
 
-
     private JPanel loadKanbanBoardFromDatabase(String projectName) {
         JPanel kanbanBoard = new JPanel(new GridBagLayout());
 
@@ -204,7 +203,6 @@ public class MainDashboard {
             }
         return listID;
     }
-
 
     private void addKanbanColumn(JPanel kanbanContent, String columnName, int listID) {
         System.out.println("test");
@@ -306,9 +304,7 @@ public class MainDashboard {
         kanbanContent.revalidate();
         kanbanContent.repaint();
     }
-
-
-    
+  
     private void loadTasksFromDatabase(JPanel taskPanel, int listID) {
         try (Connection connection = DatabaseConnector.getConnection();
             PreparedStatement stmt = connection.prepareStatement("SELECT taskName FROM tasks WHERE listID = ?")) {
@@ -325,7 +321,7 @@ public class MainDashboard {
             JOptionPane.showMessageDialog(null, "Failed to load tasks from database.");
         }
     }
-    
+  
     private void addTaskToDatabase(int listID, String taskName, String description, String dueDate, String priority) {
         try (Connection connection = DatabaseConnector.getConnection();
             PreparedStatement stmt = connection.prepareStatement(
@@ -376,6 +372,7 @@ public class MainDashboard {
         taskPanel.revalidate();
         taskPanel.repaint();
     }
+    
     private void showTaskDetails(int taskID, String taskName, String description, String dueDate, String priority) {
         JDialog taskDialog = new JDialog((Frame) null, "Task Details", true);
         taskDialog.setLayout(new GridLayout(5, 2, 10, 10));
@@ -593,6 +590,7 @@ public class MainDashboard {
         
         return priority;
     }
+    
     private boolean isProjectNameUnique(String projectName, int userID) {
         boolean isUnique = false;
         
