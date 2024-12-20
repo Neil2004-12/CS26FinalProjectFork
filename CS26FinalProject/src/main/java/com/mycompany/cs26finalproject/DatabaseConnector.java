@@ -20,7 +20,7 @@ public class DatabaseConnector {
     public static Connection getConnection() {
         Connection connection = null;
         try {
-            // Load the MySQL driver (if using older JDBC versions)
+            // Load the MySQL driver
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             // Establish the connection

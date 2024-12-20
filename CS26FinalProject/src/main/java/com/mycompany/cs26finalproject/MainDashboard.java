@@ -12,13 +12,14 @@ import java.util.ArrayList;
 
 public class MainDashboard {
     private GridBagConstraints gbc = new GridBagConstraints();
-
+    
     private JPanel projectListPanel; // Panel for the list of projects
     private ButtonGroup projectButtonGroup; // Button group for project radio buttons
     private JPanel mainContent; // Kanban board area
     private int userID;
     private int currentUserID; // The logged-in user's ID
     private String currentUserName;
+    private JButton selectedButton = null; // Track the selected button
     
     public MainDashboard(int userID) {
         this.currentUserID = userID;
@@ -44,12 +45,12 @@ public class MainDashboard {
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
         topNavBar.add(titleLabel);
         
-         // Add Welcome Label
+        // Add Welcome Label
         JLabel welcomeLabel = new JLabel("Welcome, " + currentUserName);
         welcomeLabel.setForeground(Color.WHITE);
         welcomeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         topNavBar.add(welcomeLabel);
-
+        
         // Add Logout Button
         JButton logoutButton = new JButton("Logout");
         logoutButton.setBackground(new Color(255, 77, 77)); // Red for logout
@@ -57,7 +58,7 @@ public class MainDashboard {
         logoutButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         logoutButton.setFocusPainted(false);
         logoutButton.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(dashboard, "Are you sure you want to log out?", 
+            int confirm = JOptionPane.showConfirmDialog(dashboard, "Are you sure you want to log out?",
                     "Logout", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 new LoginFrame().setVisible(true);
@@ -71,7 +72,7 @@ public class MainDashboard {
         dateTimeLabel.setForeground(Color.WHITE); // White text for contrast
         dateTimeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         topNavBar.add(dateTimeLabel);
-
+        
         // Update the date/time label every second
         Timer timer = new Timer(1000, e -> {
             SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
@@ -145,7 +146,7 @@ public class MainDashboard {
         addProjectButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         addProjectButton.addActionListener(e -> {
             String projectName = JOptionPane.showInputDialog(dashboard, "Enter project name:");
-
+            
             if (projectName != null && !projectName.trim().isEmpty()) {
                 if (isProjectNameUnique(projectName, currentUserID)) {
                     addProjectToDatabase(projectName);
@@ -206,88 +207,10 @@ public class MainDashboard {
         dashboard.setVisible(true);
     }
     
-    private String getSelectedProjectName() {
-        for (Component comp : projectListPanel.getComponents()) {
-            if (comp instanceof JButton) {
-                JButton button = (JButton) comp;
-                if (button.getBackground().equals(new Color(0, 102, 153))) { // Assuming selected buttons are highlighted
-                    return button.getText();
-                }
-            }
-        }
-        return null; // No project selected
-    }
-    public String getUserNameById(int userID) {
-        String username = null;    
-        
-        try (Connection connection = DatabaseConnector.getConnection();
-                PreparedStatement stmt = connection.prepareStatement("SELECT userName FROM users WHERE id = ?")) {
-            
-            stmt.setInt(1, userID); // Set the userID in the query
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                username = rs.getString("userName"); // Retrieve the username
-            }
-        } catch (SQLException e) {
-            e.printStackTrace(); // Handle SQL exception
-        }
-        
-        return username;
-    }
-    
-    private void updateProjectNameInDatabase(String oldName, String newName) {
-        try (Connection connection = DatabaseConnector.getConnection();
-                PreparedStatement stmt = connection.prepareStatement("UPDATE projects SET projectName = ? WHERE projectName = ?")) {
-            stmt.setString(1, newName);
-            stmt.setString(2, oldName);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Failed to update project name in the database.");
-        }
-    }
-    
-    private void deleteProjectFromDatabase(String projectName) {
-        try (Connection connection = DatabaseConnector.getConnection();
-                PreparedStatement stmt = connection.prepareStatement("DELETE FROM projects WHERE projectName = ?")) {
-            stmt.setString(1, projectName);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Failed to delete project from the database.");
-        }
-    }
-
-    private void refreshProjectList() {
-        projectListPanel.removeAll();
-        loadProjectsFromDatabase();
-        projectListPanel.revalidate();
-        projectListPanel.repaint();
-    }
-
-
-    private void loadProjectsFromDatabase() {
-        try (Connection connection = DatabaseConnector.getConnection();
-             PreparedStatement stmt = connection.prepareStatement("SELECT projectName FROM projects WHERE userID = ?")) {
-
-            stmt.setInt(1, currentUserID);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                String projectName = rs.getString("projectName");
-                addProjectToUI(projectName);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Failed to load projects from database.");
-        }
-    }
-
     private void addProjectToDatabase(String projectName) {
         try (Connection connection = DatabaseConnector.getConnection();
-             PreparedStatement stmt = connection.prepareStatement("INSERT INTO projects (projectName, userID) VALUES (?, ?)");) {
-
+                PreparedStatement stmt = connection.prepareStatement("INSERT INTO projects (projectName, userID) VALUES (?, ?)");) {
+            
             stmt.setString(1, projectName);
             stmt.setInt(2, currentUserID);
             stmt.executeUpdate();
@@ -296,9 +219,7 @@ public class MainDashboard {
             JOptionPane.showMessageDialog(null, "Failed to add project to database.");
         }
     }
-
-    private JButton selectedButton = null; // Track the selected button
-
+    
     private void addProjectToUI(String projectName) {
         JButton projectButton = new JButton(projectName);
         projectButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -353,81 +274,31 @@ public class MainDashboard {
         projectListPanel.revalidate();
         projectListPanel.repaint();
     }
-
-
-
-    private void setActiveProject(String projectName) {
-        System.out.println("test123");
-        mainContent.removeAll();
-        mainContent.setLayout(new BorderLayout());
-
-        // Load the Kanban board and pass the project name
-        JPanel kanbanBoard = loadKanbanBoardFromDatabase(projectName);
-        mainContent.add(kanbanBoard, BorderLayout.CENTER);
-
-        JButton addListButton = new JButton("Add List");
-        addListButton.addActionListener(e -> {
-            String listName = JOptionPane.showInputDialog(mainContent, "Enter list name:");
-            if (listName != null && !listName.trim().isEmpty()) {
-                // Add list to database
-                int listID = addListToDatabase(projectName, listName);
-                // Add the Kanban column (task list) to the UI
-                addKanbanColumn(kanbanBoard, listName, listID);
-            }
-        });
-        mainContent.add(addListButton, BorderLayout.SOUTH);
-
-        mainContent.revalidate();
-        mainContent.repaint();
-    }
-
-    private JPanel loadKanbanBoardFromDatabase(String projectName) {
-        JPanel kanbanBoard = new JPanel(new GridBagLayout());
-
-        try (Connection connection = DatabaseConnector.getConnection();
-             PreparedStatement stmt = connection.prepareStatement("SELECT id, listName FROM lists WHERE projectID = (SELECT id FROM projects WHERE projectName = ? AND userID = ?)");) {
-
-            stmt.setString(1, projectName);
-            stmt.setInt(2, currentUserID);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                String listName = rs.getString("listName");
-                int listID = rs.getInt("id");
-                addKanbanColumn(kanbanBoard, listName, listID);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Failed to load Kanban board from database.");
-        }
-
-        return kanbanBoard;
-    }
-
+    
     private int addListToDatabase(String projectName, String listName) {
         int listID = -1; // Default value if insertion fails
         try (Connection connection = DatabaseConnector.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(
-            "INSERT INTO lists (listName, projectID) VALUES (?, (SELECT id FROM projects WHERE projectName = ? AND userID = ?))",
-            Statement.RETURN_GENERATED_KEYS)) {
-
-                stmt.setString(1, listName);
-                stmt.setString(2, projectName);
-                stmt.setInt(3, currentUserID);
-                stmt.executeUpdate();
-                // Get the generated list ID
-                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        listID = generatedKeys.getInt(1);
-                    }
+                PreparedStatement stmt = connection.prepareStatement(
+                        "INSERT INTO lists (listName, projectID) VALUES (?, (SELECT id FROM projects WHERE projectName = ? AND userID = ?))",
+                        Statement.RETURN_GENERATED_KEYS)) {
+            
+            stmt.setString(1, listName);
+            stmt.setString(2, projectName);
+            stmt.setInt(3, currentUserID);
+            stmt.executeUpdate();
+            // Get the generated list ID
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    listID = generatedKeys.getInt(1);
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Failed to add list to database.");
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to add list to database.");
+        }
         return listID;
     }
-
+    
     private void addKanbanColumn(JPanel kanbanContent, String columnName, int listID) {
         System.out.println("test");
         GridBagConstraints columnGbc = new GridBagConstraints();
@@ -528,29 +399,12 @@ public class MainDashboard {
         kanbanContent.revalidate();
         kanbanContent.repaint();
     }
-  
-    private void loadTasksFromDatabase(JPanel taskPanel, int listID) {
-        try (Connection connection = DatabaseConnector.getConnection();
-            PreparedStatement stmt = connection.prepareStatement("SELECT taskName FROM tasks WHERE listID = ?")) {
-
-            stmt.setInt(1, listID);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                String taskName = rs.getString("taskName");
-                addTaskToColumn(taskPanel, taskName); // Add task to the column UI
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Failed to load tasks from database.");
-        }
-    }
-  
+    
     private void addTaskToDatabase(int listID, String taskName, String description, String dueDate, String priority) {
         try (Connection connection = DatabaseConnector.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(
-                 "INSERT INTO tasks (taskName, listID, description, due_date, priority) VALUES (?, ?, ?, ?, ?)")) {
-
+                PreparedStatement stmt = connection.prepareStatement(
+                        "INSERT INTO tasks (taskName, listID, description, due_date, priority) VALUES (?, ?, ?, ?, ?)")) {
+            
             stmt.setString(1, taskName);
             stmt.setInt(2, listID);
             stmt.setString(3, description);
@@ -562,7 +416,7 @@ public class MainDashboard {
             JOptionPane.showMessageDialog(null, "Failed to add task to database.");
         }
     }
-
+    
     private void addTaskToColumn(JPanel taskPanel, String taskName) {
         JLabel taskCard = new JLabel(taskName);
         taskCard.setOpaque(true);
@@ -589,200 +443,128 @@ public class MainDashboard {
                 showTaskDetails(taskID, taskName, description, dueDate, priority, projectID);
             }
         });
-
+        
         taskPanel.add(taskCard);
         taskPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         
         taskPanel.revalidate();
         taskPanel.repaint();
     }
-    private int getProjectIDFromTask(int taskID) {
-        int projectID = -1; // Default value if no project is found
-        try (Connection connection = DatabaseConnector.getConnection()) {
-            String query = "SELECT l.projectID FROM tasks t " +
-                       "JOIN lists l ON t.listID = l.id " +
-                       "WHERE t.id = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setInt(1, taskID);
-                ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    projectID = rs.getInt("projectID");
-                }
-            }
+    
+    private void updateProjectNameInDatabase(String oldName, String newName) {
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement("UPDATE projects SET projectName = ? WHERE projectName = ?")) {
+            stmt.setString(1, newName);
+            stmt.setString(2, oldName);
+            stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to update project name in the database.");
         }
-        return projectID;
-}
-
-    private void showTaskDetails(int taskID, String taskName, String description, String dueDate, String priority, int currentProjectID) {
-        JDialog taskDialog = new JDialog((Frame) null, "Task Details", true);
-        taskDialog.setLayout(new GridLayout(6, 2, 10, 10)); // Increase row count to accommodate new field
-        
-        taskDialog.add(new JLabel("Task Name:"));
-        JTextField nameField = new JTextField(taskName);
-        taskDialog.add(nameField);
-        
-        taskDialog.add(new JLabel("Description:"));
-        JTextArea descriptionField = new JTextArea(description, 3, 20);
-        taskDialog.add(new JScrollPane(descriptionField));
-        
-        taskDialog.add(new JLabel("Due Date:"));
-        JTextField dueDateField = new JTextField(dueDate);
-        taskDialog.add(dueDateField);
-        
-        taskDialog.add(new JLabel("Priority:"));
-        JComboBox<String> priorityBox = new JComboBox<>(new String[]{"Low", "Medium", "High"});
-        priorityBox.setSelectedItem(priority);
-        taskDialog.add(priorityBox);
-        
-        // Add JComboBox to select a new list
-        taskDialog.add(new JLabel("Transfer to List:"));
-        JComboBox<String> listBox = new JComboBox<>();
-        // Get available lists for the current project
-        List<String> lists = getProjectLists(currentProjectID); // Method to fetch lists for the project
-        for (String listName : lists) {
-            listBox.addItem(listName);
-        }
-        taskDialog.add(listBox);
-        
-        JButton saveButton = new JButton("Save");
-        saveButton.addActionListener(e -> {
-            // Save the updated task information to the database
-            updateTaskInDatabase(taskID, nameField.getText(), descriptionField.getText(),
-                    dueDateField.getText(), (String) priorityBox.getSelectedItem(), (String) listBox.getSelectedItem());
-            
-            String projectName = getProjectNameByTaskID(taskID);
-            setActiveProject(projectName);
-            // Close the task detail dialog
-            taskDialog.dispose();
-        });
-        taskDialog.add(saveButton);
-        
-        JButton deleteButton = new JButton("Delete");
-        deleteButton.addActionListener(e -> {
-            // Delete the task from the database
-            deleteTaskFromDatabase(taskID);
-            // Close the task detail dialog
-            taskDialog.dispose();
-        });
-        taskDialog.add(deleteButton);
-        
-        taskDialog.setSize(400, 300);
-        taskDialog.setVisible(true);
-    }
-
-    private List<String> getProjectLists(int projectID) {
-        List<String> lists = new ArrayList<>();
-        try (Connection connection = DatabaseConnector.getConnection()) {
-            String query = "SELECT listName FROM lists WHERE projectID = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setInt(1, projectID);
-                ResultSet rs = stmt.executeQuery();
-                while (rs.next()) {
-                    lists.add(rs.getString("listName"));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return lists;
-    }
-
-    private void updateTaskInDatabase(int taskID, String taskName, String description, String dueDate, String priority, String listName) {
-    try (Connection connection = DatabaseConnector.getConnection()) {
-        // Get listID from listName
-        String listQuery = "SELECT id FROM lists WHERE listName = ?";
-        int listID = -1;
-        try (PreparedStatement stmt = connection.prepareStatement(listQuery)) {
-            stmt.setString(1, listName);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                listID = rs.getInt("id");
-            }
-        }
-
-        if (listID != -1) {
-            // Update the task with the new listID
-            String updateQuery = "UPDATE tasks SET taskName = ?, description = ?, due_date = ?, priority = ?, listID = ? WHERE id = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
-                stmt.setString(1, taskName);
-                stmt.setString(2, description);
-                stmt.setString(3, dueDate);
-                stmt.setString(4, priority);
-                stmt.setInt(5, listID);
-                stmt.setInt(6, taskID);
-                stmt.executeUpdate();
-            }
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-}
-
-    private void showListDetails(String listName, int listID) {
-        JDialog taskDialog = new JDialog((Frame) null, "List Details", true);
-        taskDialog.setLayout(new GridLayout(5, 2, 10, 10));
-
-        taskDialog.add(new JLabel("List Name:"));
-        JTextField nameField = new JTextField(listName);
-        taskDialog.add(nameField);
-
-        JButton saveButton = new JButton("Save");
-        saveButton.addActionListener(e -> {
-            // Save the updated task information to the database
-            updateListInDatabase(listID, nameField.getText());         
-            reloadUI();
-            
-            // Close the task detail dialog
-            taskDialog.dispose();
-        });
-        taskDialog.add(saveButton);
-
-        JButton deleteButton = new JButton("Delete");
-        deleteButton.addActionListener(e -> {
-            // Delete the task from the database
-            deleteListFromDatabase(listID);
-            reloadUI();
-            // Close the task detail dialog
-            taskDialog.dispose();
-        });
-        taskDialog.add(deleteButton);
-
-        taskDialog.setSize(400, 300);
-        taskDialog.setVisible(true);
     }
     
-    private void updateTaskInDatabase(int taskID, String taskName, String description, String dueDate, String priority) {
-        // SQL query to update the task in the database
-        String updateQuery = "UPDATE tasks SET taskName = ?, description = ?, due_date = ?, priority = ? WHERE id = ?";
-        
+    private void updateListInDatabase(int listID, String newListName) {
         try (Connection connection = DatabaseConnector.getConnection();
-                PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
+                PreparedStatement stmt = connection.prepareStatement("UPDATE lists SET listName = ? WHERE id = ?")) {
             
-            // Set the parameters for the query
-            stmt.setString(1, taskName);
-            stmt.setString(2, description);
-            stmt.setString(3, dueDate);
-            stmt.setString(4, priority);
-            stmt.setInt(5, taskID);
+            stmt.setString(1, newListName);
+            stmt.setInt(2, listID);
+            stmt.executeUpdate();
             
-            // Execute the update
-            int rowsAffected = stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to update list in the database.");
+        }
+    }
+    
+    private void updateTaskInDatabase(int taskID, String taskName, String description, String dueDate, String priority, String listName) {
+        try (Connection connection = DatabaseConnector.getConnection()) {
+            // Get listID from listName
+            String listQuery = "SELECT id FROM lists WHERE listName = ?";
+            int listID = -1;
+            try (PreparedStatement stmt = connection.prepareStatement(listQuery)) {
+                stmt.setString(1, listName);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    listID = rs.getInt("id");
+                }
+            }
             
-            if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(null, "Task updated successfully");
-                System.out.println("test");                      
-                reloadUI();
-            } else {
-                JOptionPane.showMessageDialog(null, "Failed to update task. Please try again.");
+            if (listID != -1) {
+                // Update the task with the new listID
+                String updateQuery = "UPDATE tasks SET taskName = ?, description = ?, due_date = ?, priority = ?, listID = ? WHERE id = ?";
+                try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
+                    stmt.setString(1, taskName);
+                    stmt.setString(2, description);
+                    stmt.setString(3, dueDate);
+                    stmt.setString(4, priority);
+                    stmt.setInt(5, listID);
+                    stmt.setInt(6, taskID);
+                    stmt.executeUpdate();
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error updating task in the database.");
         }
     }
-
+    
+    private void loadProjectsFromDatabase() {
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement("SELECT projectName FROM projects WHERE userID = ?")) {
+            
+            stmt.setInt(1, currentUserID);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                String projectName = rs.getString("projectName");
+                addProjectToUI(projectName);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to load projects from database.");
+        }
+    }
+    
+    private JPanel loadKanbanBoardFromDatabase(String projectName) {
+        JPanel kanbanBoard = new JPanel(new GridBagLayout());
+        
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement("SELECT id, listName FROM lists WHERE projectID = (SELECT id FROM projects WHERE projectName = ? AND userID = ?)");) {
+            
+            stmt.setString(1, projectName);
+            stmt.setInt(2, currentUserID);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                String listName = rs.getString("listName");
+                int listID = rs.getInt("id");
+                addKanbanColumn(kanbanBoard, listName, listID);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to load Kanban board from database.");
+        }
+        
+        return kanbanBoard;
+    }
+      
+    private void loadTasksFromDatabase(JPanel taskPanel, int listID) {
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement("SELECT taskName FROM tasks WHERE listID = ?")) {
+            
+            stmt.setInt(1, listID);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                String taskName = rs.getString("taskName");
+                addTaskToColumn(taskPanel, taskName); // Add task to the column UI
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to load tasks from database.");
+        }
+    } 
+    
     private void deleteTaskFromDatabase(int taskID) {
         int confirmation = JOptionPane.showConfirmDialog(
                 null,
@@ -804,9 +586,111 @@ public class MainDashboard {
                 JOptionPane.showMessageDialog(null, "Failed to delete task from database.");
             }
         }
+    }   
+    
+    private void deleteListFromDatabase(int listID) {
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement("DELETE FROM lists WHERE id = ?")) {
+            
+            stmt.setInt(1, listID);
+            stmt.executeUpdate();
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to delete list from the database.");
+        }
     }
-
-    private int getTaskIDFromName(String taskName) {
+    
+    private void deleteProjectFromDatabase(String projectName) {
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement("DELETE FROM projects WHERE projectName = ?")) {
+            stmt.setString(1, projectName);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to delete project from the database.");
+        }
+    }
+    
+    private String getProjectNameByTaskID(int taskID) {
+        String projectName = null;
+        
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement(
+                        "SELECT p.projectName " +
+                                "FROM projects p " +
+                                "JOIN lists l ON l.projectID = p.id " +
+                                "JOIN tasks t ON t.listID = l.id " +
+                                "WHERE t.id = ?")) {
+            
+            stmt.setInt(1, taskID);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    projectName = rs.getString("projectName");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to fetch project name for the given task ID.");
+        }
+        
+        return projectName;
+    }
+    
+    private String getSelectedProjectName() {
+        for (Component comp : projectListPanel.getComponents()) {
+            if (comp instanceof JButton) {
+                JButton button = (JButton) comp;
+                if (button.getBackground().equals(new Color(0, 102, 153))) { // Assuming selected buttons are highlighted
+                    return button.getText();
+                }
+            }
+        }
+        return null; // No project selected
+    }
+    
+    public String getUserNameById(int userID) {
+        String username = null;
+        
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement("SELECT userName FROM users WHERE id = ?")) {
+            
+            stmt.setInt(1, userID); // Set the userID in the query
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                username = rs.getString("userName"); // Retrieve the username
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle SQL exception
+        }
+        
+        return username;
+    }
+    
+    private String getListNameFromDatabase(int listID) {
+        String listName = null;
+        
+        try (Connection connection = DatabaseConnector.getConnection();
+                PreparedStatement stmt = connection.prepareStatement("SELECT listName FROM lists WHERE id = ?")) {
+            
+            stmt.setInt(1, listID);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                listName = rs.getString("listName");
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to fetch the list name from the database.");
+        }
+        
+        return listName;
+    }
+    
+     private int getTaskIDFromName(String taskName) {
         int taskID = -1; // Default value if task not found
         String query = "SELECT id FROM tasks WHERE taskName = ?";
         
@@ -890,6 +774,139 @@ public class MainDashboard {
         return priority;
     }
     
+    private int getProjectIDFromTask(int taskID) {
+        int projectID = -1; // Default value if no project is found
+        try (Connection connection = DatabaseConnector.getConnection()) {
+            String query = "SELECT l.projectID FROM tasks t " +
+                    "JOIN lists l ON t.listID = l.id " +
+                    "WHERE t.id = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setInt(1, taskID);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    projectID = rs.getInt("projectID");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return projectID;
+    }
+    
+    private List<String> getProjectLists(int projectID) {
+        List<String> lists = new ArrayList<>();
+        try (Connection connection = DatabaseConnector.getConnection()) {
+            String query = "SELECT listName FROM lists WHERE projectID = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setInt(1, projectID);
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    lists.add(rs.getString("listName"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lists;
+    }
+    
+    private void showTaskDetails(int taskID, String taskName, String description, String dueDate, String priority, int currentProjectID) {
+        JDialog taskDialog = new JDialog((Frame) null, "Task Details", true);
+        taskDialog.setLayout(new GridLayout(6, 2, 10, 10)); // Increase row count to accommodate new field
+        
+        taskDialog.add(new JLabel("Task Name:"));
+        JTextField nameField = new JTextField(taskName);
+        taskDialog.add(nameField);
+        
+        taskDialog.add(new JLabel("Description:"));
+        JTextArea descriptionField = new JTextArea(description, 3, 20);
+        taskDialog.add(new JScrollPane(descriptionField));
+        
+        taskDialog.add(new JLabel("Due Date:"));
+        JTextField dueDateField = new JTextField(dueDate);
+        taskDialog.add(dueDateField);
+        
+        taskDialog.add(new JLabel("Priority:"));
+        JComboBox<String> priorityBox = new JComboBox<>(new String[]{"Low", "Medium", "High"});
+        priorityBox.setSelectedItem(priority);
+        taskDialog.add(priorityBox);
+        
+        // Add JComboBox to select a new list
+        taskDialog.add(new JLabel("Transfer to List:"));
+        JComboBox<String> listBox = new JComboBox<>();
+        // Get available lists for the current project
+        List<String> lists = getProjectLists(currentProjectID); // Method to fetch lists for the project
+        for (String listName : lists) {
+            listBox.addItem(listName);
+        }
+        taskDialog.add(listBox);
+        
+        JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(e -> {
+            // Save the updated task information to the database
+            updateTaskInDatabase(taskID, nameField.getText(), descriptionField.getText(),
+                    dueDateField.getText(), (String) priorityBox.getSelectedItem(), (String) listBox.getSelectedItem());
+            
+            String projectName = getProjectNameByTaskID(taskID);
+            setActiveProject(projectName);
+            // Close the task detail dialog
+            taskDialog.dispose();
+        });
+        taskDialog.add(saveButton);
+        
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.addActionListener(e -> {
+            // Delete the task from the database
+            deleteTaskFromDatabase(taskID);
+            // Close the task detail dialog
+            taskDialog.dispose();
+        });
+        taskDialog.add(deleteButton);
+        
+        taskDialog.setSize(400, 300);
+        taskDialog.setVisible(true);
+    }
+     
+    private void refreshProjectList() {
+        projectListPanel.removeAll();
+        loadProjectsFromDatabase();
+        projectListPanel.revalidate();
+        projectListPanel.repaint();
+    }
+    
+    private void showListDetails(String listName, int listID) {
+        JDialog taskDialog = new JDialog((Frame) null, "List Details", true);
+        taskDialog.setLayout(new GridLayout(5, 2, 10, 10));
+        
+        taskDialog.add(new JLabel("List Name:"));
+        JTextField nameField = new JTextField(listName);
+        taskDialog.add(nameField);
+        
+        JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(e -> {
+            // Save the updated task information to the database
+            updateListInDatabase(listID, nameField.getText());
+            reloadUI();
+            
+            // Close the task detail dialog
+            taskDialog.dispose();
+        });
+        taskDialog.add(saveButton);
+        
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.addActionListener(e -> {
+            // Delete the task from the database
+            deleteListFromDatabase(listID);
+            reloadUI();
+            // Close the task detail dialog
+            taskDialog.dispose();
+        });
+        taskDialog.add(deleteButton);
+        
+        taskDialog.setSize(400, 300);
+        taskDialog.setVisible(true);
+    }
+    
     private boolean isProjectNameUnique(String projectName, int userID) {
         boolean isUnique = false;
         
@@ -913,32 +930,6 @@ public class MainDashboard {
         return isUnique;
     }
     
-    private String getProjectNameByTaskID(int taskID) {
-        String projectName = null;
-        
-        try (Connection connection = DatabaseConnector.getConnection();
-                PreparedStatement stmt = connection.prepareStatement(
-                        "SELECT p.projectName " +
-                                "FROM projects p " +
-                                "JOIN lists l ON l.projectID = p.id " +
-                                "JOIN tasks t ON t.listID = l.id " +
-                                "WHERE t.id = ?")) {
-            
-            stmt.setInt(1, taskID);
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    projectName = rs.getString("projectName");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Failed to fetch project name for the given task ID.");
-        }
-        
-        return projectName;
-    }
-    
     private void reloadUI() {
         projectListPanel.removeAll();
         mainContent.removeAll();
@@ -949,55 +940,32 @@ public class MainDashboard {
         mainContent.revalidate();
         mainContent.repaint();
     }
-
-    private String getListNameFromDatabase(int listID) {
-        String listName = null;
+    
+    private void setActiveProject(String projectName) {
+        System.out.println("test123");
+        mainContent.removeAll();
+        mainContent.setLayout(new BorderLayout());
         
-        try (Connection connection = DatabaseConnector.getConnection();
-                PreparedStatement stmt = connection.prepareStatement("SELECT listName FROM lists WHERE id = ?")) {
-            
-            stmt.setInt(1, listID);
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                listName = rs.getString("listName");
+        // Load the Kanban board and pass the project name
+        JPanel kanbanBoard = loadKanbanBoardFromDatabase(projectName);
+        mainContent.add(kanbanBoard, BorderLayout.CENTER);
+        
+        JButton addListButton = new JButton("Add List");
+        addListButton.addActionListener(e -> {
+            String listName = JOptionPane.showInputDialog(mainContent, "Enter list name:");
+            if (listName != null && !listName.trim().isEmpty()) {
+                // Add list to database
+                int listID = addListToDatabase(projectName, listName);
+                // Add the Kanban column (task list) to the UI
+                addKanbanColumn(kanbanBoard, listName, listID);
             }
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Failed to fetch the list name from the database.");
-        }
+        });
+        mainContent.add(addListButton, BorderLayout.SOUTH);
         
-        return listName;
+        mainContent.revalidate();
+        mainContent.repaint();
     }
     
-    private void updateListInDatabase(int listID, String newListName) {
-        try (Connection connection = DatabaseConnector.getConnection();
-                PreparedStatement stmt = connection.prepareStatement("UPDATE lists SET listName = ? WHERE id = ?")) {
-            
-            stmt.setString(1, newListName);
-            stmt.setInt(2, listID);
-            stmt.executeUpdate();
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Failed to update list in the database.");
-        }
-    }
-    
-    private void deleteListFromDatabase(int listID) {
-        try (Connection connection = DatabaseConnector.getConnection();
-                PreparedStatement stmt = connection.prepareStatement("DELETE FROM lists WHERE id = ?")) {
-            
-            stmt.setInt(1, listID);
-            stmt.executeUpdate();
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Failed to delete list from the database.");
-        }
-    }
-
     public static void main(String[] args) {
         // Assuming the userID is passed as a command-line argument
         if (args.length > 0) {
