@@ -6,12 +6,14 @@ package com.mycompany.cs26finalproject;
 import java.sql.SQLException;
 import java.sql.*;
 import javax.swing.JOptionPane;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 /**
  *
  * @author dionardvale
  */
 public class RegistrationForm extends javax.swing.JFrame {
-
+    private static final String EMAIL_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
     /**
      * Creates new form RegistrationForm
      */
@@ -156,7 +158,11 @@ public class RegistrationForm extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    public static boolean isValidEmail(String email) {
+        Pattern pattern = Pattern.compile(EMAIL_REGEX);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
     private void confirmPasswordTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmPasswordTextFieldActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_confirmPasswordTextFieldActionPerformed
@@ -183,6 +189,13 @@ public class RegistrationForm extends javax.swing.JFrame {
             return;
         }
         
+        // Check if the email is valid
+        if (!isValidEmail(email)) {
+            JOptionPane.showMessageDialog(this, "Invalid email format. Please enter a valid email address.");
+            return;
+        }
+
+        // Check if the account already exists (duplicate email or username)
         if (duplicateChecker(email, userName)) {
             JOptionPane.showMessageDialog(this, "Account already exists. Please enter a different username/email.");
             return;
@@ -197,13 +210,14 @@ public class RegistrationForm extends javax.swing.JFrame {
         // Check if passwords match
         if (!passwordStr.trim().equals(confirmPasswordStr.trim())) {
             JOptionPane.showMessageDialog(this, "Passwords do not match.");
-        return;
+            return;
         }
 
         // If all validations pass, insert user data
         insertUserData(firstName, lastName, email, userName, passwordStr);
         this.dispose();
         new LoginFrame().setVisible(true);
+
 
     }//GEN-LAST:event_signInRegisterButtonActionPerformed
     private boolean isEmpty(String... fields) {
